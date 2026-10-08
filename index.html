@@ -6,8 +6,12 @@
 <title>Cleanout Planner</title>
 <meta name="description" content="A 3-day constipation cleanout and daily maintenance plan, dosed by your child's weight.">
 <script>
-  // Apply a saved light/dark choice before the page draws, so it doesn't flash.
-  try { const t = localStorage.getItem("cleanout-planner-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+  // Dark mode by default; a saved choice from the switch wins. Applied before the page draws, so it doesn't flash.
+  (function () {
+    let t = null;
+    try { t = localStorage.getItem("cleanout-planner-theme"); } catch (e) {}
+    document.documentElement.dataset.theme = (t === "light" || t === "dark") ? t : "dark";
+  })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,6 +211,8 @@
   summary { font-weight: 600; color: var(--heading); cursor: pointer; }
   ul { padding-left: 1.2em; margin: 8px 0; }
   li { margin: 4px 0; }
+  .printonly { display: none; }
+  @media print { .printonly { display: block; } }
   .band-inner { position: relative; }
   header.band .band-inner { padding-top: 64px; }
   .theme-toggle {
@@ -215,8 +221,15 @@
     color: var(--band-text); background: transparent; border: 1px solid var(--band-muted); border-radius: var(--radius); cursor: pointer;
   }
   .theme-toggle:focus-visible { outline: 2px solid var(--band-text); outline-offset: 2px; }
-  .stool-chart { display: block; width: 100%; max-width: 413px; height: auto; margin: 14px auto 6px;
-                 border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+  /* Stool chart, drawn in the page (original artwork) */
+  .bss { display: grid; gap: 6px; margin: 14px 0 6px; }
+  .bss-row { display: grid; grid-template-columns: 58px 104px 1fr; align-items: center; gap: 10px;
+             padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: #FAF7F2; }
+  .bss-row.goal { border: 2px solid var(--ok); }
+  .bss-row svg { width: 104px; height: 42px; display: block; }
+  .bss-type { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #3F3F46; }
+  .bss-tag { display: block; margin-top: 3px; color: #15803D; font-weight: 600; }
+  .bss-desc { font-size: 15px; line-height: 1.35; color: #27272A; }
   .weight-ok { display: flex; gap: 12px; align-items: center; min-height: 56px; padding: 10px 14px; margin-top: 10px;
                border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel); cursor: pointer; }
   .weight-ok input { width: 24px; height: 24px; flex: none; accent-color: var(--brand); margin: 0; }
@@ -313,7 +326,6 @@
       </div>
     </details>
     <div class="btns" style="margin-top:18px"><button class="btn" type="button" id="done-btn">Show my child's plan</button></div>
-    <p class="hint">You can change any of this later.</p>
   </section>
 
   <!-- TODAY -->
@@ -325,8 +337,7 @@
   <!-- PLAN -->
   <section class="card hidden" id="plan" aria-labelledby="plan-h">
     <h2 id="plan-h">Your child's plan</h2>
-    <p style="margin:0">Here is exactly what to give, and when.</p>
-    <p class="confirm" id="plan-weight"></p>
+    <p class="confirm printonly" id="plan-weight"></p>
 
     <h3>Part 1 · 3-day cleanout · Days 1, 2 and 3</h3>
     <div class="dose">
@@ -349,15 +360,12 @@
 
   <!-- CALENDAR -->
   <section class="card noprint hidden" id="cal" aria-labelledby="cal-h">
-    <p class="eyebrow">Reminders</p>
     <h2 id="cal-h">Get dose reminders on your phone</h2>
-    <p style="margin-top:0">This puts every dose in your phone's calendar, with an alert at the time of each dose.</p>
     <div id="cal-body"></div>
   </section>
 
   <!-- SCHEDULE -->
   <section class="card hidden" id="sched" aria-labelledby="sched-h">
-    <p class="eyebrow">Schedule</p>
     <h2 id="sched-h">Day by day</h2>
     <details>
       <summary>Show the full schedule</summary>
@@ -405,15 +413,76 @@
     <h2 id="stool-h">Stool chart</h2>
     <details>
       <summary>What should my child's stool look like?</summary>
-      <img class="stool-chart" src="bristol-stool-chart.png" width="413" height="484"
-           alt="Bristol Stool Chart. Type 1: separate hard lumps. Type 2: lumpy and sausage-like. Type 3: sausage shape with cracks. Type 4: smooth, soft sausage or snake. Type 5: soft blobs with clear-cut edges. Type 6: mushy with ragged edges. Type 7: watery, no solid pieces.">
+      <div class="bss" role="list" aria-label="Stool types 1 to 7">
+        <div class="bss-row" role="listitem">
+          <span class="bss-type">Type 1</span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <g fill="#5a3818"><circle cx="16" cy="18" r="7"/><circle cx="38" cy="32" r="7.5"/><circle cx="60" cy="16" r="6.5"/><circle cx="82" cy="31" r="7"/><circle cx="104" cy="19" r="7.5"/></g>
+            <g fill="#8a5a2b" opacity=".7"><circle cx="14" cy="16" r="2"/><circle cx="36" cy="30" r="2"/><circle cx="58" cy="14" r="2"/><circle cx="80" cy="29" r="2"/><circle cx="102" cy="17" r="2"/></g>
+          </svg>
+          <span class="bss-desc">Separate hard lumps, like pebbles. Hard to pass.</span>
+        </div>
+        <div class="bss-row" role="listitem">
+          <span class="bss-type">Type 2</span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <g fill="#5a3818" stroke="#3a220d" stroke-width="1.5"><circle cx="18" cy="25" r="11"/><circle cx="35" cy="21" r="12"/><circle cx="52" cy="27" r="12"/><circle cx="69" cy="21" r="12"/><circle cx="86" cy="27" r="12"/><circle cx="102" cy="23" r="11"/></g>
+          </svg>
+          <span class="bss-desc">Sausage-shaped, but lumpy.</span>
+        </div>
+        <div class="bss-row" role="listitem">
+          <span class="bss-type">Type 3</span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <rect x="8" y="13" width="104" height="22" rx="11" fill="#6b4422"/>
+            <g fill="none" stroke="#3a220d" stroke-width="1.6" stroke-linecap="round">
+              <path d="M22 15l3 7-2 6"/><path d="M38 14l-2 8 4 5"/><path d="M54 16l3 6-1 7"/><path d="M70 14l-3 7 3 6"/><path d="M86 15l2 8-3 5"/><path d="M100 17l-2 6 2 5"/>
+            </g>
+          </svg>
+          <span class="bss-desc">Sausage-shaped, with cracks on the surface.</span>
+        </div>
+        <div class="bss-row" role="listitem">
+          <span class="bss-type">Type 4</span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <path d="M12 32 C36 18, 70 40, 108 18" fill="none" stroke="#6b4422" stroke-width="12" stroke-linecap="round"/>
+            <path d="M16 29 C38 17, 70 37, 104 17" fill="none" stroke="#8f6033" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+          </svg>
+          <span class="bss-desc">Smooth, soft sausage or snake.</span>
+        </div>
+        <div class="bss-row goal" role="listitem">
+          <span class="bss-type">Type 5<b class="bss-tag">Goal</b></span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <g fill="#7a4e26"><ellipse cx="18" cy="18" rx="11" ry="7" transform="rotate(-12 18 18)"/><ellipse cx="44" cy="31" rx="12" ry="7.5" transform="rotate(8 44 31)"/><ellipse cx="66" cy="15" rx="10" ry="6.5" transform="rotate(-6 66 15)"/><ellipse cx="88" cy="31" rx="11" ry="7" transform="rotate(10 88 31)"/><ellipse cx="106" cy="16" rx="9" ry="6" transform="rotate(-10 106 16)"/></g>
+          </svg>
+          <span class="bss-desc">Soft blobs with clear edges. Passes easily.</span>
+        </div>
+        <div class="bss-row goal" role="listitem">
+          <span class="bss-type">Type 6<b class="bss-tag">Goal</b></span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <g fill="#a8733b"><circle cx="16" cy="26" r="6"/><circle cx="24" cy="20" r="5"/><circle cx="27" cy="30" r="5.5"/><circle cx="36" cy="23" r="6.5"/><circle cx="45" cy="30" r="5"/><circle cx="48" cy="19" r="5.5"/><circle cx="57" cy="26" r="6.5"/><circle cx="66" cy="19" r="5"/><circle cx="68" cy="31" r="5.5"/><circle cx="77" cy="24" r="6.5"/><circle cx="86" cy="30" r="5"/><circle cx="88" cy="19" r="5"/><circle cx="96" cy="25" r="6"/><circle cx="105" cy="29" r="4.5"/><circle cx="104" cy="20" r="4"/></g>
+            <g fill="#c79352"><circle cx="22" cy="24" r="2.5"/><circle cx="40" cy="27" r="2.5"/><circle cx="60" cy="22" r="2.5"/><circle cx="80" cy="27" r="2.5"/><circle cx="97" cy="22" r="2"/><circle cx="31" cy="17" r="1.8"/><circle cx="73" cy="34" r="1.8"/></g>
+          </svg>
+          <span class="bss-desc">Mushy, fluffy pieces with ragged edges.</span>
+        </div>
+        <div class="bss-row" role="listitem">
+          <span class="bss-type">Type 7</span>
+          <svg viewBox="0 0 120 48" aria-hidden="true">
+            <path d="M14 28 C10 18, 30 14, 42 18 C52 10, 74 12, 80 19 C96 14, 112 22, 106 30 C110 38, 88 40, 76 36 C64 42, 40 40, 32 35 C20 38, 12 34, 14 28 Z" fill="#c4964f" opacity=".9"/>
+            <ellipse cx="54" cy="25" rx="16" ry="4" fill="#ddb878" opacity=".7"/>
+            <circle cx="114" cy="40" r="3" fill="#c4964f" opacity=".9"/>
+          </svg>
+          <span class="bss-desc">Watery, with no solid pieces.</span>
+        </div>
+      </div>
+      <h3>The goal: soft, mushy stools every day</h3>
+      <p>Aim for <strong>Type 5 or 6</strong> on the chart above: soft blobs or fluffy, mushy pieces that pass easily, with no pain and no soiling.</p>
+      <h3>During the 3-day cleanout</h3>
+      <p>Very soft or watery stools (<strong>Type 6–7</strong>) are expected. This means the cleanout is working.</p>
+      <h3>After the cleanout: adjust by what you see</h3>
       <ul>
-        <li><strong>Types 1 and 2</strong> (hard lumps): your child is still constipated.</li>
-        <li><strong>The goal is soft stools like mashed potatoes</strong>, about <strong>Types 4 to 6</strong>, every day, easy to pass and without pain or soiling.</li>
-        <li><strong>During the 3-day cleanout</strong>, very soft or watery stools (<strong>Types 6 and 7</strong>) are expected. This means the cleanout is working.</li>
-        <li><strong>After the cleanout</strong>, if stools are hard (Types 1 to 3), the daily Miralax dose may need to go up. If they are watery (Type 7), it may need to go down. Do not give more than 2 capfuls a day.</li>
+        <li><strong>Type 1–3</strong> (hard or lumpy): daily Miralax may need to go up</li>
+        <li><strong>Type 7</strong> (watery every day): it may need to go down</li>
+        <li><strong>Never more than 2 capfuls a day</strong></li>
       </ul>
-      <p class="hint">The chart's labels, such as "mild diarrhea" for Type 6, describe stools in general. For this plan, mushy stools are the goal. Ask your child's provider if you are not sure.</p>
+      <p class="hint">Not sure? Ask your child's provider.</p>
     </details>
   </section>
 </main>
@@ -976,7 +1045,7 @@ $("cal-body").addEventListener("click", e => {
     weightConfirmed = saved.confirmed === true || setupDone;
   }
   if (!els.start.value) els.start.value = toISODate(todayLocal());
-  // Light/dark switch: follows the phone's setting until the parent picks one.
+  // Light/dark switch: starts dark until the parent picks one.
   const themeBtn = $("theme-toggle");
   const isDark = () => document.documentElement.dataset.theme
     ? document.documentElement.dataset.theme === "dark"
