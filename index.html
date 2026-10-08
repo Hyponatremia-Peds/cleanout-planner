@@ -240,6 +240,11 @@
   .summary-text { margin: 0; color: var(--heading); font-weight: 500; }
   details.options { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-top: 16px; background: var(--soft); }
   details.options summary { font-weight: 500; font-size: 15px; }
+  details.cal-choice { margin-top: 10px; padding: 0; }
+  details.cal-choice summary { font-size: 17px; font-weight: 600; padding: 14px; min-height: 56px; }
+  details.cal-choice > div { padding: 0 14px 14px; }
+  details.cal-choice[open] { background: var(--panel); border-color: var(--brand); }
+  .cal-sub { display: block; font-size: 14px; font-weight: 400; color: var(--body); margin-left: 1.1em; }
   .banner .btn { font-weight: 600; }
   .hidden { display: none !important; }
 
@@ -980,14 +985,10 @@ function gcalButtonsHTML(st, d, stim, start, b) {
     `<a class="btn secondary" target="_blank" rel="noopener" href="${esc(gcalLink(l.title, l.details, l.start, l.rrule))}">${esc(l.label)}</a>`).join("")}</div>`;
 }
 
-// Shows the calendar option that works on this device first; the others stay one tap away.
+// Two dropdowns; the parent opens the calendar they use.
 function renderCal(st, d, stim, start, b) {
   const icsBtn = `<div class="btns"><button class="btn" type="button" data-action="ics">Add all doses to my calendar</button></div>`;
-  const google = gcalButtonsHTML(st, d, stim, start, b);
-  const googleHint = `<p class="hint" style="margin-top:0">Tap each button and press <strong>Save</strong>. There are 4 in total.</p>`;
-  let html;
-  if (IS_IOS) {
-    html = `
+  const safariWarning = IS_IOS ? `
       <div class="banner ${IOS_NOT_SAFARI ? "stop" : "warn"}">
         <p><strong>On iPhone and iPad, this only works in Safari.</strong></p>
         <p>${IOS_NOT_SAFARI
@@ -996,22 +997,25 @@ function renderCal(st, d, stim, start, b) {
           Tap <b>Copy link for Safari</b>, open <b>Safari</b>, paste the link into the address bar, then tap the button there. Your child's plan comes with the link.</p>
         <div class="btns" style="margin-top:10px"><button class="btn secondary" type="button" data-action="copy">Copy link for Safari</button></div>
         <p class="copy-msg" style="margin-top:8px"></p>
+      </div>` : "";
+  const appleHint = IS_IOS
+    ? `<p class="hint">After you tap it, choose <strong>Add All</strong>.</p>`
+    : `<p class="hint">This downloads a calendar file. Open it to add the doses. On iPhone or iPad, use Safari.</p>`;
+  // Keep whichever dropdown is open when the page redraws (e.g. after returning from Google Calendar).
+  const wasOpen = [...document.querySelectorAll("#cal-body details.cal-choice")].map(x => x.open);
+  $("cal-body").innerHTML = `
+    <details class="options cal-choice">
+      <summary>Apple Calendar <span class="cal-sub">iPhone, iPad, Mac or Outlook</span></summary>
+      <div style="margin-top:12px">${safariWarning}${icsBtn}${appleHint}</div>
+    </details>
+    <details class="options cal-choice">
+      <summary>Google Calendar <span class="cal-sub">Android or computer</span></summary>
+      <div style="margin-top:12px">
+        <p class="hint" style="margin-top:0">Tap each button and press <strong>Save</strong>. There are 4 in total.</p>
+        ${gcalButtonsHTML(st, d, stim, start, b)}
       </div>
-      ${icsBtn}
-      <p class="hint">After you tap it, choose <strong>Add All</strong>.</p>
-      <details style="margin-top:14px"><summary>Use Google Calendar instead</summary><div style="margin-top:10px">${googleHint}${google}</div></details>`;
-  } else if (IS_ANDROID) {
-    html = `${googleHint}${google}
-      <details style="margin-top:14px"><summary>Use a different calendar app</summary>
-        <div style="margin-top:10px">${icsBtn}<p class="hint">This downloads a calendar file. Open it to add the doses.</p></div></details>`;
-  } else {
-    html = `
-      <h3>Apple Calendar or Outlook</h3>${icsBtn}
-      <p class="hint">This downloads a calendar file. Open it to add the doses.</p>
-      <h3>Google Calendar</h3>${googleHint}${google}
-      <p class="hint">You can also import the calendar file in Google Calendar: <em>Settings → Import &amp; export → Import</em>.</p>`;
-  }
-  $("cal-body").innerHTML = html;
+    </details>`;
+  document.querySelectorAll("#cal-body details.cal-choice").forEach((x, i) => { if (wasOpen[i]) x.open = true; });
 }
 
 function downloadICS() {
