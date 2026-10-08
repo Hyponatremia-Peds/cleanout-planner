@@ -27,9 +27,9 @@ Then you'll see:
 
 - **What to do today**, with a checkbox for each dose, a "1 of 3 given" counter, and an "All done for today" message showing when the next dose is.
 - **Your child's full plan**: the 3-day cleanout, then the daily maintenance dose.
-- **Reminders**: add every dose to your phone's calendar with an alert at the time of each dose.
-  - **iPhone or iPad:** use **Safari**. The calendar button does not work in other browsers such as Brave or Chrome. The app has a **Copy link for Safari** button that brings your child's plan with it.
-  - **Android:** tap the 4 Google Calendar buttons and press **Save** on each.
+- **Reminders**: add every dose to your phone's calendar with an alert at the time of each dose. Open **Apple Calendar** or **Google Calendar**, whichever you use.
+  - **Apple Calendar on iPhone or iPad:** use **Safari**. The calendar button does not work in other browsers such as Brave or Chrome. The app has a **Copy link for Safari** button that brings your child's plan with it.
+  - **Google Calendar:** tap the 4 buttons and press **Save** on each.
 - **Tips**: how to mix the medicine, what the goal is, and when to call your provider.
 - **Stool chart**: the Bristol Stool Form Scale, with what to aim for (Type 5 or 6) during and after the cleanout.
 
