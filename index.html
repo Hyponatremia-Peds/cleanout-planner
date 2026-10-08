@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cleanout Planner</title>
+<meta name="description" content="A 3-day constipation cleanout and daily maintenance plan, dosed by your child's weight.">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #f0f3f6;
+    --text: #1b2430;
+    --muted: #5a6675;
+    --border: #d9dee5;
+    --accent: #1f6f8b;
+    --accent-text: #ffffff;
+    --accent-soft: #e3f0f5;
+    --warn-bg: #fff4e0;
+    --warn-border: #e5b45c;
+    --warn-text: #6b4a0e;
+    --stop-bg: #fde8e8;
+    --stop-border: #d97070;
+    --stop-text: #7a1f1f;
+    --ok: #2e7d4f;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161c;
+      --surface: #1b2129;
+      --surface-2: #232b35;
+      --text: #e8edf2;
+      --muted: #9aa6b4;
+      --border: #333d49;
+      --accent: #5bb3d1;
+      --accent-text: #0d1a20;
+      --accent-soft: #1d3540;
+      --warn-bg: #3a2e14;
+      --warn-border: #a07c32;
+      --warn-text: #f3d9a2;
+      --stop-bg: #3d1d1d;
+      --stop-border: #a04d4d;
+      --stop-text: #f5c4c4;
+      --ok: #6fcf97;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161c;
+    --surface: #1b2129;
+    --surface-2: #232b35;
+    --text: #e8edf2;
+    --muted: #9aa6b4;
+    --border: #333d49;
+    --accent: #5bb3d1;
+    --accent-text: #0d1a20;
+    --accent-soft: #1d3540;
+    --warn-bg: #3a2e14;
+    --warn-border: #a07c32;
+    --warn-text: #f3d9a2;
+    --stop-bg: #3d1d1d;
+    --stop-border: #a04d4d;
+    --stop-text: #f5c4c4;
+    --ok: #6fcf97;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+  header { margin-bottom: 18px; }
+  header h1 { font-size: 1.6rem; line-height: 1.2; margin: 0 0 4px; }
+  header .by { color: var(--muted); margin: 0; }
+  h2 { font-size: 1.2rem; margin: 0 0 12px; }
+  h3 { font-size: 1.02rem; margin: 18px 0 8px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .step { display: inline-block; background: var(--accent); color: var(--accent-text); border-radius: 999px;
+          width: 1.6em; height: 1.6em; text-align: center; line-height: 1.6em; font-size: .85em; margin-right: 6px; }
+  label { font-weight: 600; display: block; margin-bottom: 6px; }
+  .hint { color: var(--muted); font-size: .9rem; margin: 6px 0 0; }
+  input[type=number], input[type=date], input[type=time], select {
+    font: inherit; color: var(--text); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; min-height: 46px;
+  }
+  input[type=number] { width: 9em; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { margin: 0; padding: 10px 16px; font-weight: 600; cursor: pointer; background: var(--surface-2); min-height: 46px; display: flex; align-items: center; }
+  .seg input:checked + label { background: var(--accent); color: var(--accent-text); }
+  .seg input:focus-visible + label { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .choices { display: grid; gap: 8px; }
+  .choice { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--border);
+            border-radius: 10px; background: var(--surface-2); cursor: pointer; font-weight: 400; margin: 0; }
+  .choice input { margin-top: 4px; width: 20px; height: 20px; flex: none; }
+  .choice.disabled { opacity: .55; cursor: not-allowed; }
+  .choice strong { display: block; }
+  .choice small { color: var(--muted); display: block; }
+  .times { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .times label { font-weight: 500; font-size: .92rem; }
+  .times input { width: 100%; }
+  .banner { border-radius: 10px; padding: 12px 14px; margin: 12px 0; border: 1px solid; }
+  .banner.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+  .banner.stop { background: var(--stop-bg); border-color: var(--stop-border); color: var(--stop-text); font-weight: 600; }
+  .banner p { margin: 0; }
+  .banner p + p { margin-top: 6px; }
+  .confirm { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; margin-top: 10px; font-weight: 600; }
+  .dose { border-left: 4px solid var(--accent); padding: 8px 0 8px 14px; margin: 10px 0; }
+  .dose .what { font-weight: 700; font-size: 1.08rem; }
+  .dose .how { color: var(--muted); }
+  .today-day { font-size: 1.35rem; font-weight: 700; margin: 0 0 4px; }
+  .check { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--border);
+           border-radius: 10px; margin: 8px 0; background: var(--surface-2); cursor: pointer; font-weight: 400; }
+  .check input { width: 24px; height: 24px; margin-top: 2px; flex: none; accent-color: var(--ok); }
+  .check .t { font-weight: 700; }
+  .check.done .what-line { text-decoration: line-through; color: var(--muted); }
+  .btn { font: inherit; font-weight: 600; border-radius: 8px; padding: 11px 16px; border: 1px solid var(--accent);
+         background: var(--accent); color: var(--accent-text); cursor: pointer; min-height: 46px; text-decoration: none; display: inline-flex; align-items: center; }
+  .btn.secondary { background: transparent; color: var(--accent); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .gcal { display: grid; gap: 8px; margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  tr.is-today td { background: var(--accent-soft); }
+  .tablewrap { overflow-x: auto; }
+  details { border-top: 1px solid var(--border); padding: 10px 0; }
+  details:first-of-type { border-top: 0; }
+  summary { font-weight: 700; cursor: pointer; }
+  ul { padding-left: 1.2em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  footer { color: var(--muted); font-size: .85rem; margin-top: 24px; }
+  .hidden { display: none !important; }
+  @media print {
+    body { background: #fff; color: #000; }
+    .noprint { display: none !important; }
+    .card { border: 1px solid #999; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Constipation Cleanout Planner</h1>
+    <p class="by">By Dr. Christian Rada, DO</p>
+  </header>
+
+  <div class="banner warn">
+    <p><strong>Use this only if your child's healthcare provider has told you to do a cleanout.</strong> Do not use it for children who weigh less than 10 kg (22 lb).</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card noprint" aria-labelledby="s1">
+    <h2 id="s1"><span class="step">1</span>Your child's weight</h2>
+    <div class="row">
+      <input id="weight" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Weight" aria-label="Child's weight">
+      <div class="seg" role="radiogroup" aria-label="Weight unit">
+        <input type="radio" name="unit" id="unit-lb" value="lb" checked><label for="unit-lb">lb</label>
+        <input type="radio" name="unit" id="unit-kg" value="kg"><label for="unit-kg">kg</label>
+      </div>
+    </div>
+    <p class="hint">Use a recent weight from a scale or your child's last visit.</p>
+    <div id="weight-msg"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card noprint hidden" id="step2" aria-labelledby="s2">
+    <h2 id="s2"><span class="step">2</span>Choose the bedtime laxative</h2>
+    <p class="hint" style="margin:0 0 12px">Your provider will usually tell you which one to use. Choose <strong>one</strong>: senna <em>or</em> bisacodyl.</p>
+    <div class="choices" id="stim-choices"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card noprint hidden" id="step3" aria-labelledby="s3">
+    <h2 id="s3"><span class="step">3</span>Start date and times</h2>
+    <div class="row" style="align-items:flex-end">
+      <div>
+        <label for="start">Cleanout start date (Day 1)</label>
+        <input id="start" type="date">
+      </div>
+      <div>
+        <label for="months">Daily maintenance for</label>
+        <select id="months">
+          <option value="6">6 months</option>
+          <option value="12">12 months</option>
+        </select>
+      </div>
+    </div>
+    <h3>Dose times</h3>
+    <div class="times">
+      <div><label for="t-am">Cleanout Miralax, morning</label><input id="t-am" type="time" value="08:00"></div>
+      <div><label for="t-pm">Cleanout Miralax, evening</label><input id="t-pm" type="time" value="18:00"></div>
+      <div><label for="t-bed">Cleanout laxative, bedtime</label><input id="t-bed" type="time" value="20:00"></div>
+      <div><label for="t-maint">Maintenance Miralax, daily</label><input id="t-maint" type="time" value="08:00"></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="card hidden" id="plan" aria-labelledby="plan-h">
+    <h2 id="plan-h">Your child's plan</h2>
+    <p class="confirm" id="plan-weight"></p>
+
+    <h3>Part 1: 3-day cleanout (Days 1, 2 and 3)</h3>
+    <div class="dose">
+      <div class="what" id="p-mira-clean"></div>
+      <div class="how" id="p-mira-clean-how"></div>
+    </div>
+    <div class="dose">
+      <div class="what" id="p-stim"></div>
+      <div class="how" id="p-stim-how"></div>
+    </div>
+
+    <h3>Part 2: Daily maintenance (starts Day 4)</h3>
+    <div class="dose">
+      <div class="what" id="p-mira-maint"></div>
+      <div class="how" id="p-mira-maint-how"></div>
+    </div>
+    <p class="hint">The maintenance dose is the same single dose used in the cleanout, given <strong>once</strong> a day (not twice). It is usually needed for at least 6 to 12 months, often longer. You can raise or lower the dose as needed to get soft, mashed-potato-like stools.</p>
+    <div class="btns noprint" style="margin-top:12px"><button class="btn secondary" type="button" onclick="window.print()">Print this plan</button></div>
+  </section>
+
+  <!-- TODAY -->
+  <section class="card hidden" id="today" aria-labelledby="today-h">
+    <h2 id="today-h">What to do today</h2>
+    <div id="today-body"></div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section class="card noprint hidden" id="cal" aria-labelledby="cal-h">
+    <h2 id="cal-h">Add reminders to your calendar</h2>
+    <p style="margin-top:0">This adds every dose to your phone's calendar with an alert at the dose time.</p>
+    <h3>iPhone, iPad or Mac (Apple Calendar), or Outlook</h3>
+    <div class="btns"><button class="btn" type="button" id="ics-btn">Download calendar file (.ics)</button></div>
+    <p class="hint">On iPhone, tap the button, then tap <strong>Add All</strong>. If nothing happens, open this page in Safari.</p>
+    <h3>Google Calendar (Android or computer)</h3>
+    <p class="hint" style="margin-top:0">Tap each button below and press <strong>Save</strong>. There are 4 in total.</p>
+    <div class="gcal" id="gcal-links"></div>
+    <p class="hint">On a computer, you can also import the .ics file above in Google Calendar: <em>Settings → Import &amp; export → Import</em>.</p>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="card hidden" id="sched" aria-labelledby="sched-h">
+    <h2 id="sched-h">Schedule</h2>
+    <div class="tablewrap"><table id="sched-table"></table></div>
+  </section>
+
+  <!-- TIPS -->
+  <section class="card" aria-labelledby="tips-h">
+    <h2 id="tips-h">Important tips</h2>
+    <details open>
+      <summary>Mixing and giving the medicines</summary>
+      <ul>
+        <li>1 capful of Miralax (polyethylene glycol, also sold as Glycolax or PEG) = 17 grams. Use the cap that comes on the medicine bottle.</li>
+        <li>Mix Miralax in a clear liquid such as juice, water or tea. <strong>Do not use milk.</strong> It is important to mix it in the full amount of liquid listed.</li>
+        <li>Have your child drink lots of liquids during the cleanout to prevent dehydration.</li>
+        <li>Check the strength on your senna or bisacodyl package. It should match the strength shown in your plan. If it does not, ask your provider or pharmacist before giving it.</li>
+      </ul>
+    </details>
+    <details>
+      <summary>What is the goal?</summary>
+      <ul>
+        <li>Soft stools the consistency of mashed potatoes every day, with no stomach pain and no soiling.</li>
+        <li>During maintenance, you can increase or decrease the daily Miralax dose as needed to reach mashed-potato-consistency stools.</li>
+        <li>If needed, the 3-day cleanout may be repeated in two weeks, or as directed by your provider.</li>
+        <li>If your child is in a lot of distress, ask your provider whether an enema should be added.</li>
+      </ul>
+    </details>
+    <details>
+      <summary>When to call your child's healthcare provider</summary>
+      <ul>
+        <li>Severe stomach pain, or pain that keeps getting worse</li>
+        <li>Vomiting, or a swollen, hard belly</li>
+        <li>Blood in the stool, or black stools</li>
+        <li>No bowel movement by the end of the 3-day cleanout</li>
+        <li>Signs of dehydration: very little urine, dry mouth, no tears, or unusual sleepiness</li>
+        <li>You are not sure about the dose or how to give a medicine</li>
+      </ul>
+      <p><strong>If your child seems very sick, call 911 or go to the nearest emergency room.</strong></p>
+    </details>
+  </section>
+
+  <footer>
+    <p>This planner gives general dosing by weight for a standard 3-day constipation cleanout and maintenance plan. It does not replace advice from your child's healthcare provider. Always follow your provider's instructions if they are different.</p>
+    <p>Your entries are saved only in this browser on this device. Nothing is sent anywhere.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ===================== DOSING DATA (from the protocol tables) ===================== */
+// Miralax rows. kgMin / lbMin are the inclusive lower bounds of each printed row.
+// The top row is printed as "70 kg and over" / "Over 154 lbs".
+const MIRALAX = [
+  { kgMin: 10, lbMin: 22,  dose: "½ capful",    mix: "4 to 6 ounces" },
+  { kgMin: 15, lbMin: 33,  dose: "¾ capful",    mix: "4 to 6 ounces" },
+  { kgMin: 20, lbMin: 44,  dose: "1 capful",    mix: "6 to 8 ounces" },
+  { kgMin: 25, lbMin: 55,  dose: "1¼ capfuls",  mix: "8 ounces" },
+  { kgMin: 30, lbMin: 66,  dose: "1½ capfuls",  mix: "8 to 12 ounces" },
+  { kgMin: 40, lbMin: 88,  dose: "1¾ capfuls",  mix: "8 to 12 ounces" },
+  { kgMin: 50, lbMin: 110, dose: "2 capfuls",   mix: "8 to 12 ounces" },
+  { kgMin: 70, lbMin: null, dose: "2½ capfuls", mix: "12 to 16 ounces" } // > 154 lb
+];
+const LB_TOP_EXCLUSIVE = 154;  // "Over 154 lbs"
+const MIN_KG = 10;             // hard floor: no dose under 10 kg
+const LB_PER_KG = 2.20462;
+const MAX_KG = 200;            // sanity check against typos
+
+// Senna rows: 10–25 kg (22–55 lb), 25–40 kg (55–88 lb), 40 kg+ (88 lb+).
+// Shared boundary values go to the higher row.
+const SENNA_BAND_KG = [10, 25, 40];
+const SENNA_BAND_LB = [22, 55, 88];
+const SENNA_FORMS = {
+  liquid: { name: "Senna liquid", strength: "8.8 mg per 5 mL", source: "by prescription",
+            doses: ["2.5 mL", "5 mL", "10 mL"] },
+  tablet: { name: "Senna tablet", strength: "8.6 mg tablet", source: "by prescription or over the counter",
+            doses: ["½ tablet", "1 tablet", "2 tablets"] },
+  chew:   { name: "Senna chocolate chew (ExLax)", strength: "15 mg chocolate chew", source: "over the counter",
+            doses: [null, "½ chocolate chew", "1 chocolate chew"] }
+};
+// Bisacodyl rows: 15–40 kg (printed 23–88 lb; 15 kg = 33 lb, so 33 lb is used), 40 kg+ (88 lb+).
+const BISA_BAND_KG = [15, 40];
+const BISA_BAND_LB = [33, 88];
+const BISA = { name: "Bisacodyl", strength: "5 mg tablet", source: "by prescription or over the counter",
+               doses: ["1 tablet", "1 to 2 tablets"] };
+
+/* ===================== DOSING LOGIC ===================== */
+function bandIndex(value, mins) {
+  let idx = -1;
+  for (let i = 0; i < mins.length; i++) if (value >= mins[i]) idx = i;
+  return idx;
+}
+
+// Returns { ok, kg, lb, miralax, senna: {liquid,tablet,chew}, bisacodyl } or { ok:false, reason }
+function computeDoses(value, unit) {
+  if (typeof value !== "number" || !isFinite(value) || value <= 0) return { ok: false, reason: "invalid" };
+  const kg = unit === "kg" ? value : value / LB_PER_KG;
+  const lb = unit === "lb" ? value : value * LB_PER_KG;
+  if (kg > MAX_KG) return { ok: false, reason: "invalid" };
+  if (kg < MIN_KG) return { ok: false, reason: "under10", kg, lb };
+
+  let mIdx, sIdx, bIdx;
+  if (unit === "kg") {
+    mIdx = bandIndex(kg, MIRALAX.map(r => r.kgMin));
+    sIdx = bandIndex(kg, SENNA_BAND_KG);
+    bIdx = bandIndex(kg, BISA_BAND_KG);
+  } else {
+    mIdx = lb > LB_TOP_EXCLUSIVE ? MIRALAX.length - 1
+         : bandIndex(lb, MIRALAX.slice(0, -1).map(r => r.lbMin));
+    sIdx = bandIndex(lb, SENNA_BAND_LB);
+    bIdx = bandIndex(lb, BISA_BAND_LB);
+  }
+  if (mIdx < 0 || sIdx < 0) return { ok: false, reason: "under10", kg, lb };
+
+  return {
+    ok: true, kg, lb,
+    miralax: MIRALAX[mIdx],
+    senna: {
+      liquid: SENNA_FORMS.liquid.doses[sIdx],
+      tablet: SENNA_FORMS.tablet.doses[sIdx],
+      chew:   SENNA_FORMS.chew.doses[sIdx]
+    },
+    bisacodyl: bIdx >= 0 ? BISA.doses[bIdx] : null
+  };
+}
+
+/* ===================== DATE HELPERS (local calendar days) ===================== */
+const pad = n => String(n).padStart(2, "0");
+function parseISODate(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+  if (!m) return null;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return d.getMonth() === +m[2] - 1 ? d : null;
+}
+const toISODate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+function addMonths(d, n) {
+  const first = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  return new Date(first.getFullYear(), first.getMonth(), Math.min(d.getDate(), last));
+}
+function diffDays(a, b) {
+  return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) -
+                     Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 864e5);
+}
+function todayLocal() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+const fmtDate = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+const fmtDateLong = d => d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+function fmtTime(hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  return new Date(2000, 0, 1, h, m).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+function withTime(d, hhmm) {
+  const [h, m] = hhmm.split(":").map(Number);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m);
+}
+
+// Day 1–3 = cleanout, Day 4 .. end = maintenance.
+function scheduleBounds(start, months) {
+  const maintStart = addDays(start, 3);
+  const maintEnd = addDays(addMonths(maintStart, months), -1);
+  return { cleanEnd: addDays(start, 2), maintStart, maintEnd, maintDays: diffDays(maintStart, maintEnd) + 1 };
+}
+
+/* ===================== STATE ===================== */
+const STORE_KEY = "cleanout-planner-v1";
+const CHECK_KEY = "cleanout-planner-checks-v1";
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) || null; } catch (e) { return null; } }
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
+
+const $ = id => document.getElementById(id);
+const els = {
+  weight: $("weight"), start: $("start"), months: $("months"),
+  tAm: $("t-am"), tPm: $("t-pm"), tBed: $("t-bed"), tMaint: $("t-maint")
+};
+let stimChoice = null; // "senna-liquid" | "senna-tablet" | "senna-chew" | "bisacodyl"
+
+function currentUnit() { return document.querySelector('input[name="unit"]:checked').value; }
+
+function readState() {
+  const raw = els.weight.value.trim();
+  return {
+    weight: raw === "" ? null : Number(raw),
+    unit: currentUnit(),
+    stim: stimChoice,
+    start: els.start.value,
+    months: Number(els.months.value),
+    times: { am: els.tAm.value || "08:00", pm: els.tPm.value || "18:00",
+             bed: els.tBed.value || "20:00", maint: els.tMaint.value || "08:00" }
+  };
+}
+
+function stimDetails(doses, choice) {
+  if (!doses || !choice) return null;
+  if (choice === "bisacodyl") {
+    if (!doses.bisacodyl) return null;
+    return { name: BISA.name, strength: BISA.strength, source: BISA.source, dose: doses.bisacodyl,
+             note: doses.bisacodyl === "1 to 2 tablets" ? "Ask your provider whether to give 1 or 2 tablets." : "" };
+  }
+  const form = choice.replace("senna-", "");
+  const f = SENNA_FORMS[form];
+  const dose = doses.senna[form];
+  if (!dose) return null;
+  return { name: f.name, strength: f.strength, source: f.source, dose, note: "" };
+}
+
+/* ===================== RENDER ===================== */
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+function render() {
+  const st = readState();
+  save(STORE_KEY, st);
+  const msg = $("weight-msg");
+  const hideAll = () => ["step2", "step3", "plan", "today", "cal", "sched"].forEach(id => $(id).classList.add("hidden"));
+
+  if (st.weight === null) { msg.innerHTML = ""; hideAll(); return; }
+  const d = computeDoses(st.weight, st.unit);
+  if (!d.ok) {
+    hideAll();
+    msg.innerHTML = d.reason === "under10"
+      ? `<div class="banner stop"><p>This planner should not be used for children who weigh less than 10 kg (22 lb).</p><p>Please contact your child's healthcare provider. No dose has been calculated.</p></div>`
+      : `<div class="banner warn"><p>Please check the weight you entered.</p></div>`;
+    return;
+  }
+  const wText = st.unit === "lb"
+    ? `${st.weight} lb (about ${d.kg.toFixed(1)} kg)`
+    : `${st.weight} kg (about ${d.lb.toFixed(1)} lb)`;
+  msg.innerHTML = `<p class="confirm">Weight entered: ${esc(wText)}. Please make sure this is correct.</p>`;
+
+  // Step 2: stimulant choices
+  $("step2").classList.remove("hidden");
+  const opts = [
+    { id: "senna-tablet", f: SENNA_FORMS.tablet, dose: d.senna.tablet },
+    { id: "senna-liquid", f: SENNA_FORMS.liquid, dose: d.senna.liquid },
+    { id: "senna-chew",   f: SENNA_FORMS.chew,   dose: d.senna.chew },
+    { id: "bisacodyl",    f: BISA,               dose: d.bisacodyl }
+  ];
+  if (stimChoice && !opts.find(o => o.id === stimChoice && o.dose)) stimChoice = null;
+  $("stim-choices").innerHTML = opts.map(o => `
+    <label class="choice${o.dose ? "" : " disabled"}">
+      <input type="radio" name="stim" value="${o.id}" ${o.dose ? "" : "disabled"} ${stimChoice === o.id ? "checked" : ""}>
+      <span><strong>${esc(o.f.name)}, ${esc(o.f.strength)}</strong>
+      <small>${o.dose ? `Dose for this weight: <b>${esc(o.dose)}</b> · ${esc(o.f.source)}` : "Not listed for this weight. Choose another option or ask your provider."}</small></span>
+    </label>`).join("");
+  document.querySelectorAll('input[name="stim"]').forEach(r =>
+    r.addEventListener("change", e => { stimChoice = e.target.value; render(); }));
+
+  const stim = stimDetails(d, stimChoice);
+  if (!stim) { ["step3", "plan", "today", "cal", "sched"].forEach(id => $(id).classList.add("hidden")); return; }
+
+  // Plan
+  $("step3").classList.remove("hidden");
+  $("plan").classList.remove("hidden");
+  $("plan-weight").textContent = `Based on a weight of ${wText}.`;
+  const m = d.miralax;
+  $("p-mira-clean").textContent = `Miralax: ${m.dose}, 2 times a day`;
+  $("p-mira-clean-how").textContent = `Mix each dose in ${m.mix} of clear liquid. Morning (${fmtTime(st.times.am)}) and evening (${fmtTime(st.times.pm)}).`;
+  $("p-stim").textContent = `${stim.name} (${stim.strength}): ${stim.dose}, 1 time a day at bedtime`;
+  $("p-stim-how").textContent = `At bedtime (${fmtTime(st.times.bed)}), only on Days 1–3. ${stim.note}`.trim();
+  $("p-mira-maint").textContent = `Miralax: ${m.dose}, 1 time a day`;
+  $("p-mira-maint-how").textContent = `Mix in ${m.mix} of clear liquid. Every day at ${fmtTime(st.times.maint)}.`;
+
+  const start = parseISODate(st.start);
+  if (!start) { ["today", "cal", "sched"].forEach(id => $(id).classList.add("hidden")); return; }
+  ["today", "cal", "sched"].forEach(id => $(id).classList.remove("hidden"));
+  const b = scheduleBounds(start, st.months);
+  renderToday(st, d, stim, start, b);
+  renderSchedule(st, d, stim, start, b);
+  renderGcal(st, d, stim, start, b);
+}
+
+function dosesForDay(dayNum, st, d, stim) {
+  const m = d.miralax;
+  if (dayNum >= 1 && dayNum <= 3) return [
+    { id: "am",  time: st.times.am,  what: `Miralax ${m.dose}`, how: `in ${m.mix} of clear liquid` },
+    { id: "pm",  time: st.times.pm,  what: `Miralax ${m.dose}`, how: `in ${m.mix} of clear liquid` },
+    { id: "bed", time: st.times.bed, what: `${stim.name} ${stim.dose}`, how: `${stim.strength}${stim.note ? ". " + stim.note : ""}` }
+  ];
+  return [{ id: "maint", time: st.times.maint, what: `Miralax ${m.dose}`, how: `in ${m.mix} of clear liquid, once today` }];
+}
+
+function renderToday(st, d, stim, start, b) {
+  const today = todayLocal();
+  const dayNum = diffDays(start, today) + 1;
+  const body = $("today-body");
+  if (dayNum < 1) {
+    body.innerHTML = `<p class="today-day">The cleanout starts ${dayNum === 0 ? "tomorrow" : `in ${1 - dayNum} days`}</p>
+      <p>Day 1 is ${esc(fmtDateLong(start))}. Make sure you have the medicines ready.</p>`;
+    return;
+  }
+  if (today > b.maintEnd) {
+    body.innerHTML = `<p class="today-day">The planned maintenance period has ended</p>
+      <p>It ended on ${esc(fmtDateLong(b.maintEnd))}. Many children need the daily stool softener for longer. Please check with your child's healthcare provider before stopping.</p>`;
+    return;
+  }
+  const isClean = dayNum <= 3;
+  const title = isClean ? `Cleanout Day ${dayNum} of 3` : `Maintenance, day ${dayNum - 3}`;
+  const checks = load(CHECK_KEY) || {};
+  const key = id => `${st.start}|${toISODate(today)}|${id}`;
+  const list = dosesForDay(dayNum, st, d, stim).map(x => {
+    const done = !!checks[key(x.id)];
+    return `<label class="check${done ? " done" : ""}">
+      <input type="checkbox" data-key="${esc(key(x.id))}" ${done ? "checked" : ""}>
+      <span class="what-line"><span class="t">${esc(fmtTime(x.time))}: ${esc(x.what)}</span><br>${esc(x.how)}</span></label>`;
+  }).join("");
+  body.innerHTML = `<p class="today-day">${esc(title)}</p><p class="hint" style="margin-top:0">${esc(fmtDateLong(today))}. Tick each dose after you give it.</p>${list}
+    ${dayNum === 3 ? `<p class="hint">Tomorrow the daily maintenance dose starts: Miralax ${esc(d.miralax.dose)} once a day.</p>` : ""}`;
+  body.querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", e => {
+    const c = load(CHECK_KEY) || {};
+    if (e.target.checked) c[e.target.dataset.key] = 1; else delete c[e.target.dataset.key];
+    save(CHECK_KEY, c);
+    e.target.closest(".check").classList.toggle("done", e.target.checked);
+  }));
+}
+
+function renderSchedule(st, d, stim, start, b) {
+  const today = todayLocal();
+  let rows = "";
+  for (let i = 0; i < 3; i++) {
+    const day = addDays(start, i);
+    const items = dosesForDay(i + 1, st, d, stim).map(x => `${esc(fmtTime(x.time))}: ${esc(x.what)}`).join("<br>");
+    rows += `<tr class="${diffDays(day, today) === 0 ? "is-today" : ""}"><td><b>Day ${i + 1}</b><br>${esc(fmtDate(day))}</td><td>Cleanout</td><td>${items}</td></tr>`;
+  }
+  const inMaint = today >= b.maintStart && today <= b.maintEnd;
+  rows += `<tr class="${inMaint ? "is-today" : ""}"><td><b>Day 4 onward</b><br>${esc(fmtDate(b.maintStart))} to ${esc(fmtDate(b.maintEnd))}</td><td>Maintenance</td><td>${esc(fmtTime(st.times.maint))}: Miralax ${esc(d.miralax.dose)}, once a day</td></tr>`;
+  $("sched-table").innerHTML = `<thead><tr><th>Day</th><th>Phase</th><th>Doses</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+/* ===================== CALENDAR ===================== */
+function icsDate(dt) {
+  return `${dt.getFullYear()}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+}
+function icsUtcNow() {
+  const n = new Date();
+  return `${n.getUTCFullYear()}${pad(n.getUTCMonth() + 1)}${pad(n.getUTCDate())}T${pad(n.getUTCHours())}${pad(n.getUTCMinutes())}${pad(n.getUTCSeconds())}Z`;
+}
+function icsEscape(s) { return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"); }
+function icsFold(line) {
+  const enc = new TextEncoder();
+  const parts = []; let cur = "", bytes = 0, limit = 75;
+  for (const ch of line) {
+    const n = enc.encode(ch).length;
+    if (bytes + n > limit) { parts.push(cur); cur = ""; bytes = 0; limit = 74; }
+    cur += ch; bytes += n;
+  }
+  parts.push(cur);
+  return parts.join("\r\n ");
+}
+function calEvents(st, d, stim, start, b) {
+  const m = d.miralax;
+  const ev = [];
+  const mixTxt = `Mix ${m.dose} of Miralax (use the cap on the bottle) in ${m.mix} of clear liquid such as juice, water or tea. Not milk.`;
+  for (let i = 0; i < 3; i++) {
+    const day = addDays(start, i);
+    ev.push({ start: withTime(day, st.times.am), title: `Cleanout Day ${i + 1}/3: Miralax ${m.dose} (morning)`,
+              desc: `${mixTxt}\nCleanout days 1–3: Miralax 2 times a day.` });
+    ev.push({ start: withTime(day, st.times.pm), title: `Cleanout Day ${i + 1}/3: Miralax ${m.dose} (evening)`,
+              desc: `${mixTxt}\nCleanout days 1–3: Miralax 2 times a day.` });
+    ev.push({ start: withTime(day, st.times.bed), title: `Cleanout Day ${i + 1}/3: ${stim.name} ${stim.dose} (bedtime)`,
+              desc: `Give ${stim.dose} of ${stim.name} (${stim.strength}) at bedtime.${stim.note ? " " + stim.note : ""}\nOnly on cleanout days 1–3.` });
+  }
+  ev.push({ start: withTime(b.maintStart, st.times.maint), title: `Daily Miralax ${m.dose}`,
+            desc: `${mixTxt}\nMaintenance: once a day (not twice). Adjust as directed to keep stools soft like mashed potatoes.`,
+            count: b.maintDays });
+  return ev;
+}
+function buildICS(st, d, stim, start, b) {
+  const stamp = icsUtcNow();
+  const uidBase = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Dr. Christian Rada DO//Cleanout Planner//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+  calEvents(st, d, stim, start, b).forEach((e, i) => {
+    const end = new Date(e.start.getTime() + 15 * 60000);
+    L.push("BEGIN:VEVENT", `UID:${uidBase}-${i}@cleanout-planner`, `DTSTAMP:${stamp}`,
+      `DTSTART:${icsDate(e.start)}`, `DTEND:${icsDate(end)}`,
+      `SUMMARY:${icsEscape(e.title)}`, `DESCRIPTION:${icsEscape(e.desc)}`);
+    if (e.count) L.push(`RRULE:FREQ=DAILY;COUNT=${e.count}`);
+    L.push("BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsEscape(e.title)}`, "TRIGGER:PT0M", "END:VALARM", "END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.map(icsFold).join("\r\n") + "\r\n";
+}
+function gcalLink(title, details, startDt, rrule) {
+  const end = new Date(startDt.getTime() + 15 * 60000);
+  const p = new URLSearchParams({ action: "TEMPLATE", text: title, details, dates: `${icsDate(startDt)}/${icsDate(end)}` });
+  try { p.set("ctz", Intl.DateTimeFormat().resolvedOptions().timeZone); } catch (e) {}
+  if (rrule) p.set("recur", `RRULE:${rrule}`);
+  return `https://calendar.google.com/calendar/render?${p.toString()}`;
+}
+function renderGcal(st, d, stim, start, b) {
+  const m = d.miralax;
+  const mixTxt = `Mix ${m.dose} of Miralax (use the cap on the bottle) in ${m.mix} of clear liquid such as juice, water or tea. Not milk.`;
+  const links = [
+    { label: "1. Cleanout Miralax, morning (3 days)", title: `Cleanout: Miralax ${m.dose} (morning)`,
+      details: `${mixTxt}\nCleanout days 1–3 only.`, start: withTime(start, st.times.am), rrule: "FREQ=DAILY;COUNT=3" },
+    { label: "2. Cleanout Miralax, evening (3 days)", title: `Cleanout: Miralax ${m.dose} (evening)`,
+      details: `${mixTxt}\nCleanout days 1–3 only.`, start: withTime(start, st.times.pm), rrule: "FREQ=DAILY;COUNT=3" },
+    { label: `3. Cleanout ${stim.name}, bedtime (3 days)`, title: `Cleanout: ${stim.name} ${stim.dose} (bedtime)`,
+      details: `Give ${stim.dose} of ${stim.name} (${stim.strength}) at bedtime.${stim.note ? " " + stim.note : ""}\nCleanout days 1–3 only.`,
+      start: withTime(start, st.times.bed), rrule: "FREQ=DAILY;COUNT=3" },
+    { label: `4. Daily maintenance Miralax (${st.months} months)`, title: `Daily Miralax ${m.dose}`,
+      details: `${mixTxt}\nMaintenance: once a day (not twice).`, start: withTime(b.maintStart, st.times.maint),
+      rrule: `FREQ=DAILY;COUNT=${b.maintDays}` }
+  ];
+  $("gcal-links").innerHTML = links.map(l =>
+    `<a class="btn secondary" target="_blank" rel="noopener" href="${esc(gcalLink(l.title, l.details, l.start, l.rrule))}">${esc(l.label)}</a>`).join("");
+}
+$("ics-btn").addEventListener("click", () => {
+  const st = readState();
+  const d = computeDoses(st.weight, st.unit);
+  const stim = stimDetails(d, st.stim);
+  const start = parseISODate(st.start);
+  if (!d.ok || !stim || !start) return;
+  const ics = buildICS(st, d, stim, start, scheduleBounds(start, st.months));
+  const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "cleanout-plan.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+
+/* ===================== INIT ===================== */
+(function init() {
+  const saved = load(STORE_KEY);
+  if (saved) {
+    if (saved.weight !== null && saved.weight !== undefined) els.weight.value = saved.weight;
+    if (saved.unit === "kg") $("unit-kg").checked = true;
+    stimChoice = saved.stim || null;
+    if (saved.start) els.start.value = saved.start;
+    if (saved.months === 12) els.months.value = "12";
+    if (saved.times) {
+      els.tAm.value = saved.times.am; els.tPm.value = saved.times.pm;
+      els.tBed.value = saved.times.bed; els.tMaint.value = saved.times.maint;
+    }
+  }
+  if (!els.start.value) els.start.value = toISODate(todayLocal());
+  ["input", "change"].forEach(ev => {
+    [els.weight, els.start, els.months, els.tAm, els.tPm, els.tBed, els.tMaint].forEach(el => el.addEventListener(ev, render));
+  });
+  document.querySelectorAll('input[name="unit"]').forEach(r => r.addEventListener("change", render));
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  render();
+})();
+</script>
+</body>
+</html>
