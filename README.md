@@ -47,7 +47,7 @@ The app keeps track of each day. The next time you open it on the same phone and
 
 **Part 2: Daily maintenance (starting Day 4)**
 - Miralax **once a day**, usually for at least 6 to 12 months, adjusted to keep stools soft like mashed potatoes.
-- **Never more than 2 capfuls a day.**
+- **Do not give more than 2 capfuls a day for daily (maintenance) dosing unless your provider tells you to.**
 
 ### Miralax (1 capful = 17 g)
 
@@ -77,7 +77,7 @@ The app keeps track of each day. The next time you open it on the same phone and
 - **Pounds** use the pound ranges in the table. A weight exactly on a boundary (55, 66, 88 or 110 lb) moves **up** to the next row.
 - **The parent must confirm the weight** before any medicine choices appear. Changing the weight clears the confirmation.
 - **Switching between lb and kg** clears the weight and asks for it again, so a number is never reinterpreted in the wrong unit.
-- **Maintenance** never goes above 2 capfuls a day.
+- **Maintenance** never goes above 2 capfuls a day, and parents are told not to go above that unless their provider says to.
 
 ---
 
