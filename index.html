@@ -203,6 +203,11 @@
   summary { font-weight: 600; color: var(--heading); cursor: pointer; }
   ul { padding-left: 1.2em; margin: 8px 0; }
   li { margin: 4px 0; }
+  .summary-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+  .summary-text { margin: 0; color: var(--heading); font-weight: 500; }
+  details.options { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-top: 16px; background: var(--soft); }
+  details.options summary { font-weight: 500; font-size: 15px; }
+  .banner .btn { font-weight: 600; }
   .hidden { display: none !important; }
 
   @media print {
@@ -229,8 +234,19 @@
     <p><strong>Use this only if your child's healthcare provider has told you to do a cleanout.</strong> Do not use it for children who weigh less than 10 kg (22 lb).</p>
   </div>
 
+  <!-- SETUP SUMMARY (shown after setup is done) -->
+  <section class="card noprint hidden" id="summary" aria-label="Your setup">
+    <div class="summary-row">
+      <div>
+        <p class="eyebrow" style="margin-bottom:4px">Your setup</p>
+        <p id="summary-text" class="summary-text"></p>
+      </div>
+      <button class="btn secondary" type="button" id="edit-btn">Change</button>
+    </div>
+  </section>
+
   <!-- STEP 1 -->
-  <section class="card noprint" aria-labelledby="s1">
+  <section class="card noprint" id="step1" aria-labelledby="s1">
     <p class="eyebrow">Step 01</p>
     <h2 id="s1">Your child's weight</h2>
     <div class="row">
@@ -247,35 +263,44 @@
   <!-- STEP 2 -->
   <section class="card noprint hidden" id="step2" aria-labelledby="s2">
     <p class="eyebrow">Step 02</p>
-    <h2 id="s2">Choose the bedtime laxative</h2>
-    <p class="hint" style="margin:0 0 14px">Your provider will usually tell you which one to use. Choose <strong>one</strong>: senna <em>or</em> bisacodyl.</p>
+    <h2 id="s2">Which bedtime medicine did your provider choose?</h2>
+    <p class="hint" style="margin:0 0 14px">Choose <strong>one</strong>.</p>
     <div class="choices" id="stim-choices"></div>
+    <div id="stim-note"></div>
   </section>
 
   <!-- STEP 3 -->
   <section class="card noprint hidden" id="step3" aria-labelledby="s3">
     <p class="eyebrow">Step 03</p>
-    <h2 id="s3">Start date and times</h2>
-    <div class="row" style="align-items:flex-end">
-      <div>
-        <label for="start">Cleanout start date (Day 1)</label>
-        <input id="start" type="date">
+    <h2 id="s3">When are you starting?</h2>
+    <label for="start">Day 1 of the cleanout</label>
+    <input id="start" type="date">
+    <details class="options">
+      <summary>Optional: change dose times or how long to continue</summary>
+      <p class="hint" style="margin-top:4px">Already set: Miralax at 8:00 AM and 6:00 PM, bedtime medicine at 8:00 PM, then daily Miralax at 8:00 AM for 6 months.</p>
+      <div class="times" style="margin-top:12px">
+        <div><label for="t-am">Cleanout Miralax, morning</label><input id="t-am" type="time" value="08:00"></div>
+        <div><label for="t-pm">Cleanout Miralax, evening</label><input id="t-pm" type="time" value="18:00"></div>
+        <div><label for="t-bed">Bedtime medicine</label><input id="t-bed" type="time" value="20:00"></div>
+        <div><label for="t-maint">Daily Miralax (after Day 3)</label><input id="t-maint" type="time" value="08:00"></div>
       </div>
-      <div>
-        <label for="months">Daily maintenance for</label>
+      <div style="margin-top:12px">
+        <label for="months">Daily Miralax for</label>
         <select id="months">
           <option value="6">6 months</option>
           <option value="12">12 months</option>
         </select>
       </div>
-    </div>
-    <h3>Dose times</h3>
-    <div class="times">
-      <div><label for="t-am">Cleanout Miralax, morning</label><input id="t-am" type="time" value="08:00"></div>
-      <div><label for="t-pm">Cleanout Miralax, evening</label><input id="t-pm" type="time" value="18:00"></div>
-      <div><label for="t-bed">Cleanout laxative, bedtime</label><input id="t-bed" type="time" value="20:00"></div>
-      <div><label for="t-maint">Maintenance Miralax, daily</label><input id="t-maint" type="time" value="08:00"></div>
-    </div>
+    </details>
+    <div class="btns" style="margin-top:18px"><button class="btn" type="button" id="done-btn">Show my child's plan</button></div>
+    <p class="hint">You can change any of this later.</p>
+  </section>
+
+  <!-- TODAY -->
+  <section class="card hidden" id="today" aria-labelledby="today-h">
+    <p class="eyebrow">Today</p>
+    <h2 id="today-h">What to do today</h2>
+    <div id="today-body"></div>
   </section>
 
   <!-- PLAN -->
@@ -303,32 +328,22 @@
     <div class="btns noprint" style="margin-top:14px"><button class="btn secondary" type="button" onclick="window.print()">Print this plan</button></div>
   </section>
 
-  <!-- TODAY -->
-  <section class="card hidden" id="today" aria-labelledby="today-h">
-    <p class="eyebrow">Today</p>
-    <h2 id="today-h">What to do today</h2>
-    <div id="today-body"></div>
-  </section>
-
   <!-- CALENDAR -->
   <section class="card noprint hidden" id="cal" aria-labelledby="cal-h">
     <p class="eyebrow">Reminders</p>
-    <h2 id="cal-h">Add reminders to your calendar</h2>
-    <p style="margin-top:0">This adds every dose to your phone's calendar with an alert at the dose time.</p>
-    <h3>iPhone, iPad or Mac (Apple Calendar), or Outlook</h3>
-    <div class="btns"><button class="btn" type="button" id="ics-btn">Download calendar file (.ics)</button></div>
-    <p class="hint">On iPhone, tap the button, then tap <strong>Add All</strong>. If nothing happens, open this page in Safari.</p>
-    <h3>Google Calendar (Android or computer)</h3>
-    <p class="hint" style="margin-top:0">Tap each button below and press <strong>Save</strong>. There are 4 in total.</p>
-    <div class="gcal" id="gcal-links"></div>
-    <p class="hint">On a computer, you can also import the .ics file above in Google Calendar: <em>Settings → Import &amp; export → Import</em>.</p>
+    <h2 id="cal-h">Get dose reminders on your phone</h2>
+    <p style="margin-top:0">This puts every dose in your phone's calendar, with an alert at the time of each dose.</p>
+    <div id="cal-body"></div>
   </section>
 
   <!-- SCHEDULE -->
   <section class="card hidden" id="sched" aria-labelledby="sched-h">
     <p class="eyebrow">Schedule</p>
     <h2 id="sched-h">Day by day</h2>
-    <div class="tablewrap"><table id="sched-table"></table></div>
+    <details>
+      <summary>Show the full schedule</summary>
+      <div class="tablewrap" style="margin-top:10px"><table id="sched-table"></table></div>
+    </details>
   </section>
 
   <!-- TIPS -->
@@ -512,6 +527,14 @@ const els = {
 };
 let stimChoice = null; // "senna-liquid" | "senna-tablet" | "senna-chew" | "bisacodyl"
 let unitChangedNotice = false;
+let setupDone = false;  // true once the parent taps "Show my child's plan"
+
+// Platform, for showing the calendar option that works on this device.
+const UA = navigator.userAgent || "";
+const IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/i.test(UA);
+// Known non-Safari iOS browsers and in-app browsers, where the calendar file usually fails.
+const IOS_NOT_SAFARI = IS_IOS && (/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|FBAN|FBAV|Instagram|Line\//.test(UA) || !!navigator.brave);
 
 function currentUnit() { return document.querySelector('input[name="unit"]:checked').value; }
 
@@ -524,8 +547,28 @@ function readState() {
     start: els.start.value,
     months: Number(els.months.value),
     times: { am: els.tAm.value || "08:00", pm: els.tPm.value || "18:00",
-             bed: els.tBed.value || "20:00", maint: els.tMaint.value || "08:00" }
+             bed: els.tBed.value || "20:00", maint: els.tMaint.value || "08:00" },
+    done: setupDone
   };
+}
+
+// The plan travels in the link's #fragment (never sent to the server), so a parent
+// can move from Brave/Chrome to Safari without re-entering anything.
+const VALID_STIMS = ["senna-tablet", "senna-liquid", "senna-chew", "bisacodyl"];
+const TIME_RX = /^([01]\d|2[0-3]):[0-5]\d$/;
+function planLink(st) {
+  const p = new URLSearchParams({ w: String(st.weight), u: st.unit, s: st.stim, d: st.start, m: String(st.months),
+    t: [st.times.am, st.times.pm, st.times.bed, st.times.maint].join(",") });
+  return `${location.origin}${location.pathname}#${p.toString()}`;
+}
+function readPlanFromHash() {
+  if (!location.hash || location.hash.length < 2) return null;
+  const p = new URLSearchParams(location.hash.slice(1));
+  const w = Number(p.get("w")), u = p.get("u"), s = p.get("s"), dt = p.get("d"), m = Number(p.get("m"));
+  const t = (p.get("t") || "").split(",");
+  if (!isFinite(w) || w <= 0 || !["lb", "kg"].includes(u) || !VALID_STIMS.includes(s) || !parseISODate(dt) ||
+      ![6, 12].includes(m) || t.length !== 4 || !t.every(x => TIME_RX.test(x))) return null;
+  return { weight: w, unit: u, stim: s, start: dt, months: m, times: { am: t[0], pm: t[1], bed: t[2], maint: t[3] }, done: true };
 }
 
 function stimDetails(doses, choice) {
@@ -549,7 +592,9 @@ function render() {
   const st = readState();
   save(STORE_KEY, st);
   const msg = $("weight-msg");
-  const hideAll = () => ["step2", "step3", "plan", "today", "cal", "sched"].forEach(id => $(id).classList.add("hidden"));
+  const RESULT_IDS = ["summary", "plan", "today", "cal", "sched"];
+  const show = (ids, on) => ids.forEach(id => $(id).classList.toggle("hidden", !on));
+  const hideAll = () => { setupDone = false; show(["step2", "step3", ...RESULT_IDS], false); show(["step1"], true); };
 
   if (st.weight === null) {
     hideAll();
@@ -587,21 +632,33 @@ function render() {
     { id: "bisacodyl",    f: BISA,               dose: d.bisacodyl }
   ];
   if (stimChoice && !opts.find(o => o.id === stimChoice && o.dose)) stimChoice = null;
-  $("stim-choices").innerHTML = opts.map(o => `
-    <label class="choice${o.dose ? "" : " disabled"}">
-      <input type="radio" name="stim" value="${o.id}" ${o.dose ? "" : "disabled"} ${stimChoice === o.id ? "checked" : ""}>
-      <span><strong>${esc(o.f.name)}, ${esc(o.f.strength)}</strong>
-      <small>${o.dose ? `Dose for this weight: <b>${esc(o.dose)}</b> · ${esc(o.f.source)}` : "Not listed for this weight. Choose another option or ask your provider."}</small></span>
+  // Only show the medicines that have a dose at this weight.
+  $("stim-choices").innerHTML = opts.filter(o => o.dose).map(o => `
+    <label class="choice">
+      <input type="radio" name="stim" value="${o.id}" ${stimChoice === o.id ? "checked" : ""}>
+      <span><strong>${esc(o.f.name)} (${esc(o.f.strength)})</strong>
+      <small>Dose: <b>${esc(o.dose)}</b> at bedtime · ${esc(o.f.source)}</small></span>
     </label>`).join("");
+  const missing = opts.filter(o => !o.dose).map(o => o.f.name);
+  $("stim-note").innerHTML = missing.length
+    ? `<p class="hint">${esc(missing.join(" and "))} ${missing.length > 1 ? "are" : "is"} not listed for this weight. If your provider chose ${missing.length > 1 ? "one of these" : "it"}, please ask them about the dose.</p>`
+    : "";
   document.querySelectorAll('input[name="stim"]').forEach(r =>
     r.addEventListener("change", e => { stimChoice = e.target.value; render(); }));
 
   const stim = stimDetails(d, stimChoice);
-  if (!stim) { ["step3", "plan", "today", "cal", "sched"].forEach(id => $(id).classList.add("hidden")); return; }
+  const start = parseISODate(st.start);
+  if (!stim) { setupDone = false; show(["step3", ...RESULT_IDS], false); show(["step1"], true); return; }
+  if (!start) setupDone = false;
+  $("done-btn").disabled = !start;
 
-  // Plan
-  $("step3").classList.remove("hidden");
-  $("plan").classList.remove("hidden");
+  // Setup steps are shown until the parent taps "Show my child's plan"; then they fold into a summary.
+  show(["step1", "step2", "step3"], !setupDone);
+  show(RESULT_IDS, setupDone);
+  save(STORE_KEY, readState());
+  if (!setupDone) return;
+
+  $("summary-text").textContent = `${wText} · ${stim.name} · Day 1: ${fmtDate(start)}`;
   $("plan-weight").textContent = `Based on a weight of ${wText}.`;
   const m = d.miralax;
   $("p-mira-clean").textContent = `Miralax: ${m.dose}, 2 times a day`;
@@ -612,13 +669,10 @@ function render() {
   $("p-mira-maint").textContent = `Miralax: ${mm.dose}, 1 time a day`;
   $("p-mira-maint-how").textContent = `Mix in ${mm.mix} of clear liquid. Every day at ${fmtTime(st.times.maint)}.`;
 
-  const start = parseISODate(st.start);
-  if (!start) { ["today", "cal", "sched"].forEach(id => $(id).classList.add("hidden")); return; }
-  ["today", "cal", "sched"].forEach(id => $(id).classList.remove("hidden"));
   const b = scheduleBounds(start, st.months);
   renderToday(st, d, stim, start, b);
   renderSchedule(st, d, stim, start, b);
-  renderGcal(st, d, stim, start, b);
+  renderCal(st, d, stim, start, b);
 }
 
 function dosesForDay(dayNum, st, d, stim) {
@@ -740,7 +794,7 @@ function gcalLink(title, details, startDt, rrule) {
   if (rrule) p.set("recur", `RRULE:${rrule}`);
   return `https://calendar.google.com/calendar/render?${p.toString()}`;
 }
-function renderGcal(st, d, stim, start, b) {
+function gcalButtonsHTML(st, d, stim, start, b) {
   const m = d.miralax;
   const mm = maintenanceDose(m);
   const mixTxt = `Mix ${m.dose} of Miralax (use the cap on the bottle) in ${m.mix} of clear liquid such as juice, water or tea. Not milk.`;
@@ -756,10 +810,45 @@ function renderGcal(st, d, stim, start, b) {
       details: `Mix ${mm.dose} of Miralax (use the cap on the bottle) in ${mm.mix} of clear liquid such as juice, water or tea. Not milk.\nMaintenance: once a day (not twice). Do not give more than 2 capfuls a day.`, start: withTime(b.maintStart, st.times.maint),
       rrule: `FREQ=DAILY;COUNT=${b.maintDays}` }
   ];
-  $("gcal-links").innerHTML = links.map(l =>
-    `<a class="btn secondary" target="_blank" rel="noopener" href="${esc(gcalLink(l.title, l.details, l.start, l.rrule))}">${esc(l.label)}</a>`).join("");
+  return `<div class="gcal">${links.map(l =>
+    `<a class="btn secondary" target="_blank" rel="noopener" href="${esc(gcalLink(l.title, l.details, l.start, l.rrule))}">${esc(l.label)}</a>`).join("")}</div>`;
 }
-$("ics-btn").addEventListener("click", () => {
+
+// Shows the calendar option that works on this device first; the others stay one tap away.
+function renderCal(st, d, stim, start, b) {
+  const icsBtn = `<div class="btns"><button class="btn" type="button" data-action="ics">Add all doses to my calendar</button></div>`;
+  const google = gcalButtonsHTML(st, d, stim, start, b);
+  const googleHint = `<p class="hint" style="margin-top:0">Tap each button and press <strong>Save</strong>. There are 4 in total.</p>`;
+  let html;
+  if (IS_IOS) {
+    html = `
+      <div class="banner ${IOS_NOT_SAFARI ? "stop" : "warn"}">
+        <p><strong>On iPhone and iPad, this only works in Safari.</strong></p>
+        <p>${IOS_NOT_SAFARI
+          ? "It looks like you are using a different browser (such as Brave or Chrome), so the button below will not work here."
+          : "If you opened this page in another browser (such as Brave or Chrome), the button below will not work."}
+          Tap <b>Copy link for Safari</b>, open <b>Safari</b>, paste the link into the address bar, then tap the button there. Your child's plan comes with the link.</p>
+        <div class="btns" style="margin-top:10px"><button class="btn secondary" type="button" data-action="copy">Copy link for Safari</button></div>
+        <p class="copy-msg" style="margin-top:8px"></p>
+      </div>
+      ${icsBtn}
+      <p class="hint">After you tap it, choose <strong>Add All</strong>.</p>
+      <details style="margin-top:14px"><summary>Use Google Calendar instead</summary><div style="margin-top:10px">${googleHint}${google}</div></details>`;
+  } else if (IS_ANDROID) {
+    html = `${googleHint}${google}
+      <details style="margin-top:14px"><summary>Use a different calendar app</summary>
+        <div style="margin-top:10px">${icsBtn}<p class="hint">This downloads a calendar file. Open it to add the doses.</p></div></details>`;
+  } else {
+    html = `
+      <h3>Apple Calendar or Outlook</h3>${icsBtn}
+      <p class="hint">This downloads a calendar file. Open it to add the doses.</p>
+      <h3>Google Calendar</h3>${googleHint}${google}
+      <p class="hint">You can also import the calendar file in Google Calendar: <em>Settings → Import &amp; export → Import</em>.</p>`;
+  }
+  $("cal-body").innerHTML = html;
+}
+
+function downloadICS() {
   const st = readState();
   const d = computeDoses(st.weight, st.unit);
   const stim = stimDetails(d, st.stim);
@@ -772,11 +861,35 @@ $("ics-btn").addEventListener("click", () => {
   a.href = url; a.download = "cleanout-plan.ics";
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+async function copyPlanLink(btn) {
+  const link = planLink(readState());
+  const msg = btn.closest(".banner").querySelector(".copy-msg");
+  try {
+    await navigator.clipboard.writeText(link);
+    msg.textContent = "Link copied. Now open Safari, tap the address bar, and paste.";
+  } catch (e) {
+    // Clipboard blocked: show the link so it can be copied by hand.
+    msg.innerHTML = `Press and hold to copy this link:<br><input type="text" readonly value="${esc(link)}" style="width:100%;margin-top:6px;font-size:14px;padding:8px;border-radius:4px;border:1px solid currentColor">`;
+    const input = msg.querySelector("input");
+    input.focus(); input.select();
+  }
+}
+
+$("cal-body").addEventListener("click", e => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  if (btn.dataset.action === "ics") downloadICS();
+  if (btn.dataset.action === "copy") copyPlanLink(btn);
 });
 
 /* ===================== INIT ===================== */
 (function init() {
-  const saved = load(STORE_KEY);
+  // A plan in the link (from "Copy link for Safari") takes priority over what this browser saved.
+  const fromLink = readPlanFromHash();
+  if (fromLink) history.replaceState(null, "", location.pathname + location.search);
+  const saved = fromLink || load(STORE_KEY);
   if (saved) {
     if (saved.weight !== null && saved.weight !== undefined) els.weight.value = saved.weight;
     if (saved.unit === "kg") $("unit-kg").checked = true;
@@ -787,8 +900,17 @@ $("ics-btn").addEventListener("click", () => {
       els.tAm.value = saved.times.am; els.tPm.value = saved.times.pm;
       els.tBed.value = saved.times.bed; els.tMaint.value = saved.times.maint;
     }
+    setupDone = saved.done === true;
   }
   if (!els.start.value) els.start.value = toISODate(todayLocal());
+  $("done-btn").addEventListener("click", () => {
+    setupDone = true; render();
+    $("summary").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("edit-btn").addEventListener("click", () => {
+    setupDone = false; render();
+    $("step1").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   ["input", "change"].forEach(ev => {
     [els.weight, els.start, els.months, els.tAm, els.tPm, els.tBed, els.tMaint].forEach(el => el.addEventListener(ev, render));
   });
