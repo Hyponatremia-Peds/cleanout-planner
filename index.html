@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cleanout Planner</title>
 <meta name="description" content="A 3-day constipation cleanout and daily maintenance plan, dosed by your child's weight.">
+<script>
+  // Apply a saved light/dark choice before the page draws, so it doesn't flash.
+  try { const t = localStorage.getItem("cleanout-planner-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -84,7 +88,7 @@
     margin: 0;
     background: var(--page);
     color: var(--body);
-    font: 16px/1.6 var(--sans);
+    font: 17px/1.6 var(--sans);
   }
   strong, b { color: var(--heading); font-weight: 600; }
 
@@ -122,22 +126,22 @@
     padding: 22px 20px; margin-bottom: 16px;
   }
   label { font-weight: 600; color: var(--heading); display: block; margin-bottom: 6px; font-size: 15px; }
-  .hint { color: var(--body); font-size: 15px; margin: 8px 0 0; }
+  .hint { color: var(--body); font-size: 16px; margin: 8px 0 0; }
 
   /* ---------- controls ---------- */
   input[type=number], input[type=date], input[type=time], select {
     font: inherit; font-size: 16px; color: var(--heading); background: var(--soft);
-    border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: 46px;
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: 50px;
   }
   input:focus-visible, select:focus-visible, .btn:focus-visible, summary:focus-visible {
     outline: 2px solid var(--brand); outline-offset: 2px; border-color: var(--brand);
   }
-  input[type=number] { width: 9em; font-family: var(--mono); font-size: 18px; }
+  input[type=number] { width: 8em; font-family: var(--mono); font-size: 22px; min-height: 56px; }
   .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .seg input { position: absolute; opacity: 0; pointer-events: none; }
   .seg label {
-    margin: 0; padding: 10px 18px; cursor: pointer; background: var(--soft); min-height: 46px;
+    margin: 0; padding: 10px 20px; cursor: pointer; background: var(--soft); min-height: 56px;
     display: flex; align-items: center; font-family: var(--mono); font-weight: 500; text-transform: uppercase; letter-spacing: .06em;
   }
   .seg label + input + label { border-left: 1px solid var(--border); }
@@ -145,11 +149,11 @@
   .seg input:focus-visible + label { outline: 2px solid var(--brand); outline-offset: -4px; }
   .choices { display: grid; gap: 8px; }
   .choice {
-    display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: flex-start; padding: 16px 14px; border: 1px solid var(--border); min-height: 56px;
     border-radius: var(--radius); background: var(--soft); cursor: pointer; font-weight: 400; margin: 0;
   }
   .choice:has(input:checked) { border-color: var(--brand); background: var(--panel); }
-  .choice input { margin-top: 4px; width: 18px; height: 18px; flex: none; accent-color: var(--brand); }
+  .choice input { margin-top: 3px; width: 22px; height: 22px; flex: none; accent-color: var(--brand); }
   .choice.disabled { opacity: .5; cursor: not-allowed; }
   .choice strong { display: block; }
   .choice small { color: var(--body); display: block; font-size: 14px; margin-top: 2px; }
@@ -159,7 +163,7 @@
   .btn {
     font: inherit; font-weight: 600; font-size: 15px; border-radius: var(--radius); padding: 11px 18px;
     border: 1px solid var(--brand); background: var(--brand); color: var(--brand-text); cursor: pointer;
-    min-height: 46px; text-decoration: none; display: inline-flex; align-items: center;
+    min-height: 52px; text-decoration: none; display: inline-flex; align-items: center;
   }
   .btn.secondary { background: var(--panel); color: var(--heading); border-color: var(--border); }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -184,10 +188,10 @@
   .dose .how { color: var(--body); font-size: 15px; }
   .today-day { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; color: var(--heading); margin: 0 0 2px; letter-spacing: -0.01em; }
   .check {
-    display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--border);
+    display: flex; gap: 14px; align-items: flex-start; padding: 16px 14px; border: 1px solid var(--border); min-height: 56px;
     border-radius: var(--radius); margin: 8px 0; background: var(--soft); cursor: pointer; font-weight: 400;
   }
-  .check input { width: 22px; height: 22px; margin-top: 1px; flex: none; accent-color: var(--ok); }
+  .check input { width: 26px; height: 26px; margin-top: 0; flex: none; accent-color: var(--ok); }
   .check .t { font-weight: 600; color: var(--heading); }
   .check.done .what-line, .check.done .what-line .t { text-decoration: line-through; color: var(--body); }
   table { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -203,6 +207,22 @@
   summary { font-weight: 600; color: var(--heading); cursor: pointer; }
   ul { padding-left: 1.2em; margin: 8px 0; }
   li { margin: 4px 0; }
+  .band-inner { position: relative; }
+  header.band .band-inner { padding-top: 64px; }
+  .theme-toggle {
+    position: absolute; top: 12px; right: 16px; min-height: 40px; padding: 6px 12px;
+    font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--band-text); background: transparent; border: 1px solid var(--band-muted); border-radius: var(--radius); cursor: pointer;
+  }
+  .theme-toggle:focus-visible { outline: 2px solid var(--band-text); outline-offset: 2px; }
+  .stool-chart { display: block; width: 100%; max-width: 413px; height: auto; margin: 14px auto 6px;
+                 border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+  .weight-ok { display: flex; gap: 12px; align-items: center; min-height: 56px; padding: 10px 14px; margin-top: 10px;
+               border: 2px solid var(--brand); border-radius: var(--radius); background: var(--panel); cursor: pointer; }
+  .weight-ok input { width: 24px; height: 24px; flex: none; accent-color: var(--brand); margin: 0; }
+  .progress { font-family: var(--mono); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--body); margin: 10px 0 4px; }
+  .all-done { border: 1px solid var(--ok); border-radius: var(--radius); padding: 12px 14px; margin-top: 10px; color: var(--heading); }
+  .all-done strong { color: var(--ok); }
   .summary-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
   .summary-text { margin: 0; color: var(--heading); font-weight: 500; }
   details.options { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-top: 16px; background: var(--soft); }
@@ -223,7 +243,7 @@
 <body>
 <header class="band">
   <div class="band-inner">
-    <p class="eyebrow">3-day cleanout · Daily maintenance</p>
+    <button type="button" class="theme-toggle noprint" id="theme-toggle" aria-label="Switch between light and dark mode"></button>
     <h1>Constipation Cleanout Planner</h1>
     <p class="by">By Dr. Christian Rada, DO</p>
   </div>
@@ -298,15 +318,14 @@
 
   <!-- TODAY -->
   <section class="card hidden" id="today" aria-labelledby="today-h">
-    <p class="eyebrow">Today</p>
     <h2 id="today-h">What to do today</h2>
     <div id="today-body"></div>
   </section>
 
   <!-- PLAN -->
   <section class="card hidden" id="plan" aria-labelledby="plan-h">
-    <p class="eyebrow">Your plan</p>
     <h2 id="plan-h">Your child's plan</h2>
+    <p style="margin:0">Here is exactly what to give, and when.</p>
     <p class="confirm" id="plan-weight"></p>
 
     <h3>Part 1 · 3-day cleanout · Days 1, 2 and 3</h3>
@@ -319,12 +338,12 @@
       <div class="how" id="p-stim-how"></div>
     </div>
 
-    <h3>Part 2 · Daily maintenance · Starts Day 4</h3>
+    <h3>Part 2 · Daily dose (maintenance) · Starts Day 4</h3>
     <div class="dose">
       <div class="what" id="p-mira-maint"></div>
       <div class="how" id="p-mira-maint-how"></div>
     </div>
-    <p class="hint">Give the maintenance dose <strong>once</strong> a day (not twice). It is usually needed for at least 6 to 12 months, often longer. You can raise or lower the dose as needed to get soft, mashed-potato-like stools, but <strong>do not give more than 2 capfuls a day</strong>.</p>
+    <p class="hint">Give the daily dose <strong>once</strong> a day (not twice). It is usually needed for at least 6 to 12 months, often longer. You can raise or lower the dose as needed to get soft, mashed-potato-like stools, but <strong>do not give more than 2 capfuls a day</strong>.</p>
     <div class="btns noprint" style="margin-top:14px"><button class="btn secondary" type="button" onclick="window.print()">Print this plan</button></div>
   </section>
 
@@ -348,7 +367,6 @@
 
   <!-- TIPS -->
   <section class="card" aria-labelledby="tips-h">
-    <p class="eyebrow">Read before starting</p>
     <h2 id="tips-h">Important tips</h2>
     <details open>
       <summary>Mixing and giving the medicines</summary>
@@ -362,8 +380,8 @@
     <details>
       <summary>What is the goal?</summary>
       <ul>
-        <li>Soft stools the consistency of mashed potatoes every day, with no stomach pain and no soiling.</li>
-        <li>During maintenance, you can increase or decrease the daily Miralax dose as needed to reach mashed-potato-consistency stools. Do not give more than 2 capfuls a day.</li>
+        <li>Soft stools the consistency of mashed potatoes every day, with no stomach pain and no soiling. See the stool chart at the bottom of this page.</li>
+        <li>After the cleanout, you can increase or decrease the daily Miralax dose as needed to reach mashed-potato-consistency stools. Do not give more than 2 capfuls a day.</li>
         <li>If needed, the 3-day cleanout may be repeated in two weeks, or as directed by your provider.</li>
         <li>If your child is in a lot of distress, ask your provider whether an enema should be added.</li>
       </ul>
@@ -379,6 +397,23 @@
         <li>You are not sure about the dose or how to give a medicine</li>
       </ul>
       <p><strong>If your child seems very sick, call 911 or go to the nearest emergency room.</strong></p>
+    </details>
+  </section>
+
+  <!-- STOOL CHART -->
+  <section class="card" aria-labelledby="stool-h">
+    <h2 id="stool-h">Stool chart</h2>
+    <details>
+      <summary>What should my child's stool look like?</summary>
+      <img class="stool-chart" src="bristol-stool-chart.png" width="413" height="484"
+           alt="Bristol Stool Chart. Type 1: separate hard lumps. Type 2: lumpy and sausage-like. Type 3: sausage shape with cracks. Type 4: smooth, soft sausage or snake. Type 5: soft blobs with clear-cut edges. Type 6: mushy with ragged edges. Type 7: watery, no solid pieces.">
+      <ul>
+        <li><strong>Types 1 and 2</strong> (hard lumps): your child is still constipated.</li>
+        <li><strong>The goal is soft stools like mashed potatoes</strong>, about <strong>Types 4 to 6</strong>, every day, easy to pass and without pain or soiling.</li>
+        <li><strong>During the 3-day cleanout</strong>, very soft or watery stools (<strong>Types 6 and 7</strong>) are expected. This means the cleanout is working.</li>
+        <li><strong>After the cleanout</strong>, if stools are hard (Types 1 to 3), the daily Miralax dose may need to go up. If they are watery (Type 7), it may need to go down. Do not give more than 2 capfuls a day.</li>
+      </ul>
+      <p class="hint">The chart's labels, such as "mild diarrhea" for Type 6, describe stools in general. For this plan, mushy stools are the goal. Ask your child's provider if you are not sure.</p>
     </details>
   </section>
 </main>
@@ -528,6 +563,7 @@ const els = {
 let stimChoice = null; // "senna-liquid" | "senna-tablet" | "senna-chew" | "bisacodyl"
 let unitChangedNotice = false;
 let setupDone = false;  // true once the parent taps "Show my child's plan"
+let weightConfirmed = false;  // parent must tick "Yes, this weight is correct" before choosing medicines
 
 // Platform, for showing the calendar option that works on this device.
 const UA = navigator.userAgent || "";
@@ -548,7 +584,8 @@ function readState() {
     months: Number(els.months.value),
     times: { am: els.tAm.value || "08:00", pm: els.tPm.value || "18:00",
              bed: els.tBed.value || "20:00", maint: els.tMaint.value || "08:00" },
-    done: setupDone
+    done: setupDone,
+    confirmed: weightConfirmed
   };
 }
 
@@ -621,7 +658,16 @@ function render() {
   const wText = st.unit === "lb"
     ? `${st.weight} lb (about ${d.kg.toFixed(1)} kg)`
     : `${st.weight} kg (about ${d.lb.toFixed(1)} lb)`;
-  msg.innerHTML = `<p class="confirm">Weight entered: ${esc(wText)}. Please make sure this is correct.</p>`;
+  msg.innerHTML = `<p class="confirm">You entered: <strong>${esc(wText)}</strong></p>
+    <label class="weight-ok"><input type="checkbox" id="weight-ok" ${weightConfirmed ? "checked" : ""}>
+      <span>Yes, this weight is correct</span></label>`;
+  $("weight-ok").addEventListener("change", e => { weightConfirmed = e.target.checked; render(); });
+  if (!weightConfirmed) {
+    setupDone = false;
+    show(["step2", "step3", ...RESULT_IDS], false); show(["step1"], true);
+    save(STORE_KEY, readState());
+    return;
+  }
 
   // Step 2: stimulant choices
   $("step2").classList.remove("hidden");
@@ -696,28 +742,53 @@ function renderToday(st, d, stim, start, b) {
     return;
   }
   if (today > b.maintEnd) {
-    body.innerHTML = `<p class="today-day">The planned maintenance period has ended</p>
-      <p>It ended on ${esc(fmtDateLong(b.maintEnd))}. Many children need the daily stool softener for longer. Please check with your child's healthcare provider before stopping.</p>`;
+    body.innerHTML = `<p class="today-day">The planned daily doses have ended</p>
+      <p>They ended on ${esc(fmtDateLong(b.maintEnd))}. Many children need the daily Miralax for longer. Please check with your child's healthcare provider before stopping.</p>`;
     return;
   }
   const isClean = dayNum <= 3;
-  const title = isClean ? `Cleanout Day ${dayNum} of 3` : `Maintenance, day ${dayNum - 3}`;
+  const title = isClean ? `Cleanout Day ${dayNum} of 3` : `Daily dose, day ${dayNum - 3}`;
   const checks = load(CHECK_KEY) || {};
   const key = id => `${st.start}|${toISODate(today)}|${id}`;
-  const list = dosesForDay(dayNum, st, d, stim).map(x => {
+  const doses = dosesForDay(dayNum, st, d, stim);
+  const list = doses.map(x => {
     const done = !!checks[key(x.id)];
     return `<label class="check${done ? " done" : ""}">
       <input type="checkbox" data-key="${esc(key(x.id))}" ${done ? "checked" : ""}>
       <span class="what-line"><span class="t">${esc(fmtTime(x.time))}: ${esc(x.what)}</span><br>${esc(x.how)}</span></label>`;
   }).join("");
-  body.innerHTML = `<p class="today-day">${esc(title)}</p><p class="hint" style="margin-top:0">${esc(fmtDateLong(today))}. Tick each dose after you give it.</p>${list}
-    ${dayNum === 3 ? `<p class="hint">Tomorrow the daily maintenance dose starts: Miralax ${esc(maintenanceDose(d.miralax).dose)} once a day.</p>` : ""}`;
-  body.querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", e => {
+
+  // What comes next, for the "All done for today" message.
+  let next;
+  if (diffDays(today, b.maintEnd) === 0) {
+    next = "Today was the last planned daily dose. Please check with your child's healthcare provider before stopping.";
+  } else {
+    const first = dosesForDay(dayNum + 1, st, d, stim).slice().sort((a, z) => a.time.localeCompare(z.time))[0];
+    next = `Next dose: tomorrow at ${fmtTime(first.time)}, ${first.what}.`;
+  }
+
+  body.innerHTML = `<p class="today-day">${esc(title)}</p><p class="hint" style="margin-top:0">${esc(fmtDateLong(today))}. Tick each dose after you give it.</p>
+    <p class="progress" id="today-progress"></p>${list}
+    <div class="all-done hidden" id="today-done"><strong>✓ All done for today.</strong> ${esc(next)}</div>
+    ${dayNum === 3 ? `<p class="hint">Tomorrow the daily dose starts: Miralax ${esc(maintenanceDose(d.miralax).dose)} once a day.</p>` : ""}
+    <details style="margin-top:12px"><summary>Coming back tomorrow?</summary>
+      <p class="hint">This page keeps track of each day for you. Open it again on this phone, in the same browser, and it will show that day's doses and the ones you have already ticked.</p>
+    </details>`;
+
+  const updateProgress = () => {
+    const boxes = [...body.querySelectorAll(".check input")];
+    const given = boxes.filter(b => b.checked).length;
+    $("today-progress").textContent = `${given} of ${boxes.length} given today`;
+    $("today-done").classList.toggle("hidden", given !== boxes.length);
+  };
+  body.querySelectorAll(".check input").forEach(cb => cb.addEventListener("change", e => {
     const c = load(CHECK_KEY) || {};
     if (e.target.checked) c[e.target.dataset.key] = 1; else delete c[e.target.dataset.key];
     save(CHECK_KEY, c);
     e.target.closest(".check").classList.toggle("done", e.target.checked);
+    updateProgress();
   }));
+  updateProgress();
 }
 
 function renderSchedule(st, d, stim, start, b) {
@@ -729,7 +800,7 @@ function renderSchedule(st, d, stim, start, b) {
     rows += `<tr class="${diffDays(day, today) === 0 ? "is-today" : ""}"><td><b>Day ${i + 1}</b><br>${esc(fmtDate(day))}</td><td>Cleanout</td><td>${items}</td></tr>`;
   }
   const inMaint = today >= b.maintStart && today <= b.maintEnd;
-  rows += `<tr class="${inMaint ? "is-today" : ""}"><td><b>Day 4 onward</b><br>${esc(fmtDate(b.maintStart))} to ${esc(fmtDate(b.maintEnd))}</td><td>Maintenance</td><td>${esc(fmtTime(st.times.maint))}: Miralax ${esc(maintenanceDose(d.miralax).dose)}, once a day</td></tr>`;
+  rows += `<tr class="${inMaint ? "is-today" : ""}"><td><b>Day 4 onward</b><br>${esc(fmtDate(b.maintStart))} to ${esc(fmtDate(b.maintEnd))}</td><td>Daily dose</td><td>${esc(fmtTime(st.times.maint))}: Miralax ${esc(maintenanceDose(d.miralax).dose)}, once a day</td></tr>`;
   $("sched-table").innerHTML = `<thead><tr><th>Day</th><th>Phase</th><th>Doses</th></tr></thead><tbody>${rows}</tbody>`;
 }
 
@@ -768,7 +839,7 @@ function calEvents(st, d, stim, start, b) {
   }
   const mm = maintenanceDose(m);
   ev.push({ start: withTime(b.maintStart, st.times.maint), title: `Daily Miralax ${mm.dose}`,
-            desc: `Mix ${mm.dose} of Miralax (use the cap on the bottle) in ${mm.mix} of clear liquid such as juice, water or tea. Not milk.\nMaintenance: once a day (not twice). Adjust as directed to keep stools soft like mashed potatoes. Do not give more than 2 capfuls a day.`,
+            desc: `Mix ${mm.dose} of Miralax (use the cap on the bottle) in ${mm.mix} of clear liquid such as juice, water or tea. Not milk.\nDaily dose: once a day (not twice). Adjust as directed to keep stools soft like mashed potatoes. Do not give more than 2 capfuls a day.`,
             count: b.maintDays });
   return ev;
 }
@@ -806,8 +877,8 @@ function gcalButtonsHTML(st, d, stim, start, b) {
     { label: `3. Cleanout ${stim.name}, bedtime (3 days)`, title: `Cleanout: ${stim.name} ${stim.dose} (bedtime)`,
       details: `Give ${stim.dose} of ${stim.name} (${stim.strength}) at bedtime.${stim.note ? " " + stim.note : ""}\nCleanout days 1–3 only.`,
       start: withTime(start, st.times.bed), rrule: "FREQ=DAILY;COUNT=3" },
-    { label: `4. Daily maintenance Miralax (${st.months} months)`, title: `Daily Miralax ${mm.dose}`,
-      details: `Mix ${mm.dose} of Miralax (use the cap on the bottle) in ${mm.mix} of clear liquid such as juice, water or tea. Not milk.\nMaintenance: once a day (not twice). Do not give more than 2 capfuls a day.`, start: withTime(b.maintStart, st.times.maint),
+    { label: `4. Daily Miralax after Day 3 (${st.months} months)`, title: `Daily Miralax ${mm.dose}`,
+      details: `Mix ${mm.dose} of Miralax (use the cap on the bottle) in ${mm.mix} of clear liquid such as juice, water or tea. Not milk.\nDaily dose: once a day (not twice). Do not give more than 2 capfuls a day.`, start: withTime(b.maintStart, st.times.maint),
       rrule: `FREQ=DAILY;COUNT=${b.maintDays}` }
   ];
   return `<div class="gcal">${links.map(l =>
@@ -901,8 +972,25 @@ $("cal-body").addEventListener("click", e => {
       els.tBed.value = saved.times.bed; els.tMaint.value = saved.times.maint;
     }
     setupDone = saved.done === true;
+    // A finished plan was confirmed when it was set up (older saved plans have no "confirmed" field).
+    weightConfirmed = saved.confirmed === true || setupDone;
   }
   if (!els.start.value) els.start.value = toISODate(todayLocal());
+  // Light/dark switch: follows the phone's setting until the parent picks one.
+  const themeBtn = $("theme-toggle");
+  const isDark = () => document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === "dark"
+    : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const labelTheme = () => { themeBtn.textContent = isDark() ? "☀ Light" : "☾ Dark"; };
+  themeBtn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("cleanout-planner-theme", next); } catch (e) {}
+    labelTheme();
+  });
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", labelTheme); } catch (e) {}
+  labelTheme();
+
   $("done-btn").addEventListener("click", () => {
     setupDone = true; render();
     $("summary").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -912,13 +1000,16 @@ $("cal-body").addEventListener("click", e => {
     $("step1").scrollIntoView({ behavior: "smooth", block: "start" });
   });
   ["input", "change"].forEach(ev => {
-    [els.weight, els.start, els.months, els.tAm, els.tPm, els.tBed, els.tMaint].forEach(el => el.addEventListener(ev, render));
+    [els.start, els.months, els.tAm, els.tPm, els.tBed, els.tMaint].forEach(el => el.addEventListener(ev, render));
+    // Any change to the weight needs a fresh "Yes, this weight is correct".
+    els.weight.addEventListener(ev, () => { weightConfirmed = false; render(); });
   });
   // Changing the unit never reinterprets the number: clear it and ask for it again.
   document.querySelectorAll('input[name="unit"]').forEach(r => r.addEventListener("change", () => {
     if (els.weight.value !== "" || (els.weight.validity && els.weight.validity.badInput)) {
       els.weight.value = "";
       unitChangedNotice = true;
+      weightConfirmed = false;
       els.weight.focus();
     }
     render();
