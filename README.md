@@ -19,20 +19,21 @@ A simple web app that gives parents their child's 3-day constipation cleanout an
 
 ## For parents: how it works
 
-1. **Enter your child's weight** in pounds or kilograms.
+1. **Enter your child's weight** in pounds or kilograms, then tick **Yes, this weight is correct**.
 2. **Choose the bedtime medicine** your provider picked: senna (tablet, liquid or chocolate chew) or bisacodyl.
 3. **Pick the start date** and tap **Show my child's plan**.
 
 Then you'll see:
 
-- **What to do today**, with a checkbox for each dose.
+- **What to do today**, with a checkbox for each dose, a "1 of 3 given" counter, and an "All done for today" message showing when the next dose is.
 - **Your child's full plan**: the 3-day cleanout, then the daily maintenance dose.
 - **Reminders**: add every dose to your phone's calendar with an alert at the time of each dose.
   - **iPhone or iPad:** use **Safari**. The calendar button does not work in other browsers such as Brave or Chrome. The app has a **Copy link for Safari** button that brings your child's plan with it.
   - **Android:** tap the 4 Google Calendar buttons and press **Save** on each.
 - **Tips**: how to mix the medicine, what the goal is, and when to call your provider.
+- **Stool chart**: a Bristol Stool Chart with an explanation of what the stools should look like during and after the cleanout.
 
-The next time you open the app on the same phone, it goes straight to today's doses.
+The app keeps track of each day. The next time you open it on the same phone and browser, it goes straight to that day's doses.
 
 **Privacy:** everything you enter stays on your own phone. Nothing is sent or stored anywhere else.
 
@@ -74,6 +75,7 @@ The next time you open the app on the same phone, it goes straight to today's do
 - Dosing is by **weight only**.
 - **Under 10 kg (22 lb):** no dose is calculated, and the parent is told to contact their provider.
 - **Pounds** use the pound ranges in the table. A weight exactly on a boundary (55, 66, 88 or 110 lb) moves **up** to the next row.
+- **The parent must confirm the weight** before any medicine choices appear. Changing the weight clears the confirmation.
 - **Switching between lb and kg** clears the weight and asks for it again, so a number is never reinterpreted in the wrong unit.
 - **Maintenance** never goes above 2 capfuls a day.
 
@@ -81,7 +83,7 @@ The next time you open the app on the same phone, it goes straight to today's do
 
 ## For the maintainer
 
-- The whole app is a single file, [`index.html`](index.html), with no build step and no server. GitHub Pages serves it from the `main` branch.
+- The app is a single file, [`index.html`](index.html), plus the stool chart image [`bristol-stool-chart.png`](bristol-stool-chart.png). There is no build step and no server. GitHub Pages serves it from the `main` branch.
 - To update it, replace `index.html`. The live site updates within a minute or two.
 - The QR code ([`qr-code.png`](qr-code.png)) always points to the live address, so it never needs to be regenerated after an update.
 - After any change to dosing, re-check every weight boundary in both kg and lb against the tables above before publishing.
