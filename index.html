@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cleanout Planner</title>
 <meta name="description" content="A 3-day constipation cleanout and daily maintenance plan, dosed by your child's weight.">
+<!-- link previews in texts and chats -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Constipation Cleanout Planner">
+<meta property="og:description" content="By Dr. Christian Rada, DO. Your child's 3-day cleanout and daily Miralax plan, dosed by weight, with dose reminders.">
+<meta property="og:url" content="https://hyponatremia-peds.github.io/cleanout-planner/">
+<meta property="og:image" content="https://hyponatremia-peds.github.io/cleanout-planner/apple-touch-icon.png">
+<meta name="twitter:card" content="summary">
+<!-- browser bar color on phones (updated by the light/dark switch) -->
+<meta name="theme-color" content="#0D0D0C">
+<!-- tab icon and home-screen icon: a caduceus -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script>
   // Dark mode by default; a saved choice from the switch wins. Applied before the page draws, so it doesn't flash.
   (function () {
@@ -35,56 +47,61 @@
     --warn-border: #FCA5A5;
     --warn-text: #7F1D1D;
     --stop-bg: #FEF2F2;
-    --stop-border: #DC2626;
-    --stop-text: #7F1D1D;
+    --stop-border: #E40014;   /* spec: danger */
+    --stop-text: #C10007;     /* spec: danger-strong */
+    --focus: #161616;         /* spec: brand-medium focus ring */
     --radius: 4px;
     --serif: "EB Garamond", "Adobe Jenson Pro", Garamond, Georgia, serif;
     --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
+  /* Dark mode based on the "Claude" design: near-black slate (#141413) as the page,
+     warm ivory (#FAF9F6) as ink, warm grays, and its semantic red/green used only for meaning. */
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --page: #0F0F10;
-      --panel: #18181B;
-      --soft: #1F1F23;
-      --brand: #F4F4F5;
-      --brand-text: #18181B;
-      --band: #09090B;
-      --band-text: #FAFAFA;
-      --band-muted: #A1A1AA;
-      --heading: #FAFAFA;
-      --body: #A1A1AA;
-      --border: #2E2E33;
-      --subtle: #26262A;
-      --ok: #4ADE80;
-      --warn-bg: #2A1517;
-      --warn-border: #7F2A2A;
-      --warn-text: #FECACA;
-      --stop-bg: #2B1414;
-      --stop-border: #B91C1C;
-      --stop-text: #FECACA;
+      --page: #141413;
+      --panel: #1C1B19;
+      --soft: #242320;
+      --brand: #FAF9F6;
+      --brand-text: #141413;
+      --band: #0D0D0C;
+      --band-text: #FAF9F6;
+      --band-muted: #A8A49B;
+      --heading: #FAF9F6;
+      --body: #C2BEB5;
+      --border: #3A3833;
+      --subtle: #2C2B27;
+      --ok: #16A34A;
+      --warn-bg: #2A1A17;
+      --warn-border: #7A2E26;
+      --warn-text: #F3CFC6;
+      --stop-bg: #2C1513;
+      --stop-border: #DC2626;
+      --stop-text: #FBD3CC;
+      --focus: #FAF9F6;
     }
   }
   :root[data-theme="dark"] {
-    --page: #0F0F10;
-    --panel: #18181B;
-    --soft: #1F1F23;
-    --brand: #F4F4F5;
-    --brand-text: #18181B;
-    --band: #09090B;
-    --band-text: #FAFAFA;
-    --band-muted: #A1A1AA;
-    --heading: #FAFAFA;
-    --body: #A1A1AA;
-    --border: #2E2E33;
-    --subtle: #26262A;
-    --ok: #4ADE80;
-    --warn-bg: #2A1517;
-    --warn-border: #7F2A2A;
-    --warn-text: #FECACA;
-    --stop-bg: #2B1414;
-    --stop-border: #B91C1C;
-    --stop-text: #FECACA;
+    --page: #141413;
+    --panel: #1C1B19;
+    --soft: #242320;
+    --brand: #FAF9F6;
+    --brand-text: #141413;
+    --band: #0D0D0C;
+    --band-text: #FAF9F6;
+    --band-muted: #A8A49B;
+    --heading: #FAF9F6;
+    --body: #C2BEB5;
+    --border: #3A3833;
+    --subtle: #2C2B27;
+    --ok: #16A34A;
+    --warn-bg: #2A1A17;
+    --warn-border: #7A2E26;
+    --warn-text: #F3CFC6;
+    --stop-bg: #2C1513;
+    --stop-border: #DC2626;
+    --stop-text: #FBD3CC;
+    --focus: #FAF9F6;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -138,7 +155,7 @@
     border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: 50px;
   }
   input:focus-visible, select:focus-visible, .btn:focus-visible, summary:focus-visible {
-    outline: 2px solid var(--brand); outline-offset: 2px; border-color: var(--brand);
+    outline: 2px solid var(--focus); outline-offset: 2px; border-color: var(--focus);
   }
   input[type=number] { width: 8em; font-family: var(--mono); font-size: 22px; min-height: 56px; }
   .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
@@ -150,7 +167,7 @@
   }
   .seg label + input + label { border-left: 1px solid var(--border); }
   .seg input:checked + label { background: var(--brand); color: var(--brand-text); }
-  .seg input:focus-visible + label { outline: 2px solid var(--brand); outline-offset: -4px; }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: -4px; }
   .choices { display: grid; gap: 8px; }
   .choice {
     display: flex; gap: 12px; align-items: flex-start; padding: 16px 14px; border: 1px solid var(--border); min-height: 56px;
@@ -158,7 +175,6 @@
   }
   .choice:has(input:checked) { border-color: var(--brand); background: var(--panel); }
   .choice input { margin-top: 3px; width: 22px; height: 22px; flex: none; accent-color: var(--brand); }
-  .choice.disabled { opacity: .5; cursor: not-allowed; }
   .choice strong { display: block; }
   .choice small { color: var(--body); display: block; font-size: 14px; margin-top: 2px; }
   .times { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
@@ -224,7 +240,7 @@
   /* Stool chart, drawn in the page (original artwork) */
   .bss { display: grid; gap: 6px; margin: 14px 0 6px; }
   .bss-row { display: grid; grid-template-columns: 58px 104px 1fr; align-items: center; gap: 10px;
-             padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: #FAF7F2; }
+             padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: #FAF9F6; }
   .bss-row.goal { border: 2px solid var(--ok); }
   .bss-row svg { width: 104px; height: 42px; display: block; }
   .bss-type { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #3F3F46; }
@@ -249,6 +265,14 @@
   .hidden { display: none !important; }
 
   @media print {
+    /* Always print black on white, even when the screen is in dark mode. */
+    :root, :root[data-theme="dark"], :root[data-theme="light"], :root:not([data-theme="light"]) {
+      --page: #FFFFFF; --panel: #FFFFFF; --soft: #FFFFFF; --subtle: #DDDDDD; --border: #999999;
+      --heading: #000000; --body: #222222; --brand: #000000; --brand-text: #FFFFFF;
+      --band: #FFFFFF; --band-text: #000000; --band-muted: #333333; --ok: #15803D;
+      --warn-bg: #FFFFFF; --warn-border: #999999; --warn-text: #000000;
+      --stop-bg: #FFFFFF; --stop-border: #C10007; --stop-text: #C10007;
+    }
     body { background: #fff; color: #000; }
     .band { background: #fff; color: #000; border-bottom: 1px solid #999; }
     .band h1, .band .by, .band .eyebrow, footer.band p { color: #000; }
@@ -664,7 +688,6 @@ let weightConfirmed = false;  // parent must tick "Yes, this weight is correct" 
 // Platform, for showing the calendar option that works on this device.
 const UA = navigator.userAgent || "";
 const IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-const IS_ANDROID = /Android/i.test(UA);
 // Known non-Safari iOS browsers and in-app browsers, where the calendar file usually fails.
 const IOS_NOT_SAFARI = IS_IOS && (/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|FBAN|FBAV|Instagram|Line\//.test(UA) || !!navigator.brave);
 
@@ -1076,7 +1099,11 @@ $("cal-body").addEventListener("click", e => {
   const isDark = () => document.documentElement.dataset.theme
     ? document.documentElement.dataset.theme === "dark"
     : window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const labelTheme = () => { themeBtn.textContent = isDark() ? "☀ Light" : "☾ Dark"; };
+  const labelTheme = () => {
+    themeBtn.textContent = isDark() ? "☀ Light" : "☾ Dark";
+    // Match the phone's browser bar to the header band.
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", isDark() ? "#0D0D0C" : "#232323");
+  };
   themeBtn.addEventListener("click", () => {
     const next = isDark() ? "light" : "dark";
     document.documentElement.dataset.theme = next;
