@@ -31,7 +31,7 @@ Then you'll see:
   - **iPhone or iPad:** use **Safari**. The calendar button does not work in other browsers such as Brave or Chrome. The app has a **Copy link for Safari** button that brings your child's plan with it.
   - **Android:** tap the 4 Google Calendar buttons and press **Save** on each.
 - **Tips**: how to mix the medicine, what the goal is, and when to call your provider.
-- **Stool chart**: a Bristol Stool Chart with an explanation of what the stools should look like during and after the cleanout.
+- **Stool chart**: the Bristol Stool Form Scale, with what to aim for (Type 5 or 6) during and after the cleanout.
 
 The app keeps track of each day. The next time you open it on the same phone and browser, it goes straight to that day's doses.
 
@@ -83,7 +83,7 @@ The app keeps track of each day. The next time you open it on the same phone and
 
 ## For the maintainer
 
-- The app is a single file, [`index.html`](index.html), plus the stool chart image [`bristol-stool-chart.png`](bristol-stool-chart.png). There is no build step and no server. GitHub Pages serves it from the `main` branch.
+- The whole app is a single file, [`index.html`](index.html), with no build step and no server. The stool chart is original artwork drawn inside the page, so there are no image files to manage. GitHub Pages serves it from the `main` branch.
 - To update it, replace `index.html`. The live site updates within a minute or two.
 - The QR code ([`qr-code.png`](qr-code.png)) always points to the live address, so it never needs to be regenerated after an update.
 - After any change to dosing, re-check every weight boundary in both kg and lb against the tables above before publishing.
