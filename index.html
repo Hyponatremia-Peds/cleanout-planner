@@ -28,6 +28,8 @@
     document.documentElement.dataset.theme = (t === "light" || t === "dark") ? t : "dark";
   })();
 </script>
+<!-- cursor-following pet, shared with the Pediatric Tools hub (only appears if chosen there) -->
+<script src="https://hyponatremia-peds.github.io/peds-tools/pets.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -128,6 +130,7 @@
   footer.band p { margin: 0 0 8px; color: var(--band-muted); }
   footer.band a { color: inherit; text-underline-offset: 2px; }
   footer.band .credit { margin-top: 14px; }
+  footer.band .sprite-credit { font-size: 12px; opacity: .8; }
   .pixel-heart { vertical-align: -2px; margin: 0 2px; image-rendering: pixelated; }
 
   /* ---------- framed column ---------- */
@@ -548,6 +551,7 @@
         <path fill="#E5484D" d="M1 0h2v1h-2zM4 0h2v1h-2zM0 1h7v2h-7zM1 3h5v1h-5zM2 4h3v1h-3zM3 5h1v1h-1z"/>
       </svg>
       <a href="https://claude.com/claude-code">Claude</a></p>
+    <p class="sprite-credit">Sprites from the PMD Sprite Repository (<a href="https://sprites.pmdcollab.org">sprites.pmdcollab.org</a>), CC BY-NC 4.0: Eevee and Espeon by Chunsoft; Jolteon by Chunsoft and dmDash. Pokémon © Nintendo, Creatures, GAME FREAK.</p>
   </div>
 </footer>
 
