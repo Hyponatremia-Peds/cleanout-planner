@@ -10,7 +10,10 @@
 <meta property="og:title" content="Constipation Cleanout Planner">
 <meta property="og:description" content="By Dr. Christian Rada, DO. Your child's 3-day cleanout and daily Miralax plan, dosed by weight, with dose reminders.">
 <meta property="og:url" content="https://hyponatremia-peds.github.io/cleanout-planner/">
-<meta property="og:image" content="https://hyponatremia-peds.github.io/cleanout-planner/apple-touch-icon.png">
+<meta property="og:image" content="https://hyponatremia-peds.github.io/cleanout-planner/og-image.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="A small snake wound around a staff (Rod of Asclepius)">
 <meta name="twitter:card" content="summary">
 <!-- browser bar color on phones (updated by the light/dark switch) -->
 <meta name="theme-color" content="#0D0D0C">
@@ -116,11 +119,6 @@
   /* ---------- bands ---------- */
   .band { background: var(--band); color: var(--band-text); }
   .band-inner { max-width: 760px; margin: 0 auto; padding: 40px 16px 36px; }
-  .eyebrow {
-    font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--body); margin: 0 0 8px;
-  }
-  .band .eyebrow { color: var(--band-muted); }
   .band h1 {
     font-family: var(--serif); font-weight: 500; letter-spacing: -0.02em;
     font-size: clamp(2rem, 7vw, 2.9rem); line-height: 1.05; margin: 0 0 10px; color: var(--band-text);
@@ -275,7 +273,7 @@
     }
     body { background: #fff; color: #000; }
     .band { background: #fff; color: #000; border-bottom: 1px solid #999; }
-    .band h1, .band .by, .band .eyebrow, footer.band p { color: #000; }
+    .band h1, .band .by, footer.band p { color: #000; }
     .wrap { border: 0; }
     .noprint { display: none !important; }
     .card { border: 1px solid #999; break-inside: avoid; }
@@ -354,7 +352,7 @@
   </section>
 
   <!-- TODAY -->
-  <section class="card hidden" id="today" aria-labelledby="today-h">
+  <section class="card noprint hidden" id="today" aria-labelledby="today-h">
     <h2 id="today-h">What to do today</h2>
     <div id="today-body"></div>
   </section>
@@ -541,7 +539,7 @@
 <footer class="band">
   <div class="band-inner">
     <p>This planner gives general dosing by weight for a standard 3-day constipation cleanout and maintenance plan. It does not replace advice from your child's healthcare provider. Always follow your provider's instructions if they are different.</p>
-    <p>Your entries are saved only in this browser on this device. Nothing is sent anywhere.</p>
+    <p>Your child's information stays on this device. It is only shared if you add reminders to Google Calendar.</p>
   </div>
 </footer>
 
@@ -1094,6 +1092,15 @@ $("cal-body").addEventListener("click", e => {
     weightConfirmed = saved.confirmed === true || setupDone;
   }
   if (!els.start.value) els.start.value = toISODate(todayLocal());
+  // Printing: open every dropdown (schedule, tips, stool chart) so the printout is complete, then put them back.
+  // The calendar dropdowns are in a section that isn't printed, so they are left alone.
+  let openedForPrint = [];
+  window.addEventListener("beforeprint", () => {
+    openedForPrint = [...document.querySelectorAll("main details:not([open])")].filter(x => !x.closest(".noprint"));
+    openedForPrint.forEach(x => { x.open = true; });
+  });
+  window.addEventListener("afterprint", () => { openedForPrint.forEach(x => { x.open = false; }); openedForPrint = []; });
+
   // Light/dark switch: starts dark until the parent picks one.
   const themeBtn = $("theme-toggle");
   const isDark = () => document.documentElement.dataset.theme
